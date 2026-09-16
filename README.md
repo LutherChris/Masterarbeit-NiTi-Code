@@ -2,15 +2,15 @@
 
 The shape-memory alloy NiTi has two bands in its electronic structure in the B2 phase, which intersect at several points near the Fermi Level.
 As part of my master’s thesis, I developed precise low-energy models in the vicinity of the nodes.
-To this end, density functional theory calculations of the band structure of NiTi were performed using Quantum ESPRESSO (QE).
+To this end, density functional theory calculations of the band structure of NiTi were performed using `Quantum ESPRESSO (QE) Version 7.6`.
 This code will continue to be developed even after I complete my master's thesis, as it can also be used for further research, such as the study of the B19' phase of NiTi.
 
 This Python code is divided into five main modules.
 
 | Module    | Usage                                                                |
 | --------- | ---------------------------------------------------------------------|
-| conv      | convergence tests for the SCF-calculation                            |
-| fermi     | plot of energy bands along high-symmetry lines in the Brillouin-zone |
+| conv      | convergence tests for the SCF calculation                            |
+| fermi     | plot of energy bands along high-symmetry lines in the Brillouin zone |
 | thz       | investigation of THz environments using `bands.x`                    |
 | model     | calculation and modelling of bands and band differences using `pw.x` |
 | transport | calculation of transport properties using BoltzTrap2                 |
@@ -19,25 +19,25 @@ This Python code is divided into five main modules.
 
 This module is used to perform the convergence tests of the self-consistency calculation of QE.
 The total energy is calculated based on the following QE parameters:
-- the parameter `ecutwfc`
-- the parameter `nk` in K_POINTS automatic: (nk nk nk 1 1 1)
-- the parameter `celldm(1)`
-- the parameter `degauss` for various smearing methods and nk
+- The parameter `ecutwfc`
+- The parameter `nk` in K_POINTS automatic: (nk nk nk 1 1 1)
+- The parameter `celldm(1)`
+- The parameter `degauss` for various smearing methods and nk
 
-The Python-blocks are activated via main variables of the parameter-name.
+The Python blocks are activated via main variables of the parameter-name.
 The variation of the QE parameters is defined via lists.
 When the program runs, the QE input file is modified for each list entry.
 The QE calculation is then performed, and the converged total energy is extracted from the output file. The energies are saved as a CSV file in a conv_results subdirectory, alongside the list entries.
 After the calculation, the respective convergence curve can be plotted. 
-A definded convergence criterium is tested during the plot.
+A defined convergence criterion is tested during the plot.
 
 ## Module fermi
 
 In the band_x.in file of QE a path is defined along highly symmetrical axes.
 This small module plots the band structure from a QE Gnuplot output-file; it does not calculate it.
 The calculation is not initiated via Python.
-First, the SCF- and the NSCF-calculation must be performed manually via the terminal (pw.x and bands.x).
-In the Python configuration-file of this module, the coordinate axes are adjusted according to this path.
+First, the SCF- and the NSCF calculation must be performed manually via the terminal (pw.x and bands.x).
+In the Python configuration file of this module, the coordinate axes are adjusted according to this path.
 
 ## Module thz
 
@@ -50,7 +50,7 @@ An additional parameter specifies a displacement of the plane.
 This value can be varied using a list; subsequently, all paths within the plane are calculated for each value in this list.
 
 The calculation proceeds in the following steps:
-- First, the SCF-calculation is performed if the QE `outdir` folder named `tmp_{prefix}` does not exist.
+- First, the SCF calculation is performed if the QE `outdir` folder named `tmp_{prefix}` does not exist.
 - Then, the contents of this folder are copied to a new folder named `tmp_{prefix}_COPY`.
 - Next, the k-points in the QE input file are modified for the subsequent path.
 - The band structure calculation is then performed using the `pw.x` program of QE.
@@ -59,7 +59,7 @@ The calculation proceeds in the following steps:
 - Upon completion of the calculation, the QE `outdir` folder `tmp_{prefix}` is cleared, and the SCF data is copied back to it from `tmp_{prefix}_COPY`. This ensures that the next band structure calculation starts from the same clean SCF calculation.
 
 After the calculation has been performed, the XML files are read and the results are saved as CSV files.
-The relevant bands are defined in the Python-code.
+The relevant bands are defined in the Python code.
 If exactly two bands are specified, the difference between them is also calculated.
 In addition to the raw data, CSV files containing the local minima for each path are saved.
 Once the calculations are complete, the data can be plotted.
@@ -72,7 +72,7 @@ This module is divided into the submodules `calc`, `use`, `plot`, and `path`.
 In `calc`, the k-grid for calculations is defined and written to the QE input file in the Card block K_POINTS {crystal_b}.
 Various k-grids can be selected, for example, cartesian grids, cylindrical grids, or polar grids along a defined path.
 
-Subsequently, the band energies and the squared magnitudes of the matrix impulse elements between valence and conduction bands can be calculated using QE.
+Subsequently, the band energies and the squared magnitudes of the matrix momentum elements between valence and conduction bands can be calculated using QE.
 The generated files are stored in a clear folder structure, and relevant information is extracted from the QE XML file.
 The calculation initiates the following steps:
 * If the SCF calculation has not yet been performed, it is executed using the QE input file located in the `{prefix}` folder. The location of this folder is defined in a `config.py` file. (see tutorials below)
@@ -91,13 +91,13 @@ These calculations are written into the CSV file as new columns.
 If a calculation of matrix momentum elements was performed, the information from QE's `p_avg.dat` file is also read in, and the relevant data is saved.
 Before modeling the band energies, coordinate transformations, PCA analysis, or data filtering to the THz-active region can be performed.
 
-As long as the model function f(x, y, z) is linear in the coefficients λ, the solving problem can be written as an overdetermined system of equations Aλ=b, where b is the vector of the Energy-Data and A is a data matrix.
+As long as the model function f(x, y, z) is linear in the coefficients λ, the solving problem can be written as an overdetermined system of equations Aλ=b, where b is the vector of the energy-Data and A is a data matrix.
 This system of equations is solved using NumPy's “least-squares” function, which minimizes the P2 norm.
 To improve the conditioning of the system of equations, there is an option to perform column scaling on the data matrix A.
 After modeling, the model is compared with the QE data points to estimate initial inaccuracies.
 The calculated model coefficients are saved as text files for later use.
 
-The models are applied in the `use`” submodule. Here, the fitted model function can be plotted on various grids and compared with the QE energies from other grids. 
+The models are applied in the `use` submodule. Here, the fitted model function can be plotted on various grids and compared with the QE energies from other grids. 
 This comparison allows for an assessment of the model's final accuracy, as it reveals any possible oscillations in the model.
 
 The `plot` submodule can be used to generate additional plots of the models and the QE data.
@@ -127,13 +127,13 @@ In the modules `model` and `thz`, there is a standard pattern for naming the con
 | `plot` in name                | plotting      |
 
 > Example 1\
-> The file `example_conv.py` in the module-folder `conv` defines all variables for the SCF-calculation and plotting.
+> The file `example_conv.py` in the module-folder `conv` defines all variables for the SCF calculation and plotting.
 
 > Example 2\
-> The file `example_model_calc.py` in the sub folder `model` defines all variables for a calculation of an bandstructurs and modelling.
+> The file `example_model_calc.py` in the sub folder `model` defines all variables for the calculation of band structures and modeling.
 
 The `lib` subfolder of each module contains files in which functions and code sections are defined.
-Alongside these files, there is always a `config.py' file.
+Alongside these files, there is always a `config.py` file.
 This file must be manually configured before the first calculation.
 Additionally, the configuration file `plot_config.py` defines global plot settings of `matplotlib` for the module.
 If a plot does not display correctly, the settings here must be adjusted.
@@ -180,7 +180,7 @@ Only three variables need to be defined manually:
 
 A folder `pseudo` containing the pseudopotentials should be located in the `main_directory` folder.
 The Quantum Espresso (QE) input-files are located inside the prefix-folder.
-Within these input-files, the QE-parameters are defined as the folder-names:
+Within these input-files, the QE parameters are defined as the folder-names:
 - prefix = '{prefix}'
 - pseudo_dir = '../pseudo'
 - outdir = '../tmp_{prefix}'
@@ -189,9 +189,9 @@ Within these input-files, the QE-parameters are defined as the folder-names:
 > The band structures of the B2 phase of NiTi are to be calculated using uspp-pseudopotentials.
 > The main calculation directory is located at: `"/home/chris/nitiB2_uspp"`.
 > The pseudo folder, containing the pseudopotentials is also located there.
-> The `conv` module for the SCF-calculation is used.
+> The `conv` module for the SCF calculation is used.
 > Therefore, the subdirectory is named `nitiB2_conv`.\
-> Consequently, the following variables in the Python-code are defined as:
+> Consequently, the following variables in the Python code are defined as:
 >   - main_directory = "/home/chris/nitiB2_uspp"
 >   - prefix = "nitiB2_conv"
 >     
@@ -212,3 +212,68 @@ Within these input-files, the QE-parameters are defined as the folder-names:
 Detailed tutorials in PDF format for the modules can be found in the “tutorials” folder.
 You'll also find an overview of all Python parameters there.
 Currently, these tutorials are still in German. As soon as I find the time, I'll translate them into English.
+
+# Installation Instructions
+
+The Quantum Espresso program is required to calculate the band energies. Version 7.6 was tested.
+During the installation parallel processing with multiple processors is activated.
+For the installation I used the following commands/steps:
+
+```
+sudo apt update && sudo apt upgrade
+```
+* initial required programs:
+```
+sudo apt install --no-install-recommends \
+    autoconf \
+    build-essential \
+    ca-certificates \
+    gfortran \
+    libblas3 \
+    libc6 \
+    libfftw3-dev \
+    libgcc-s1 \
+    liblapack-dev \
+    wget \
+    libopenmpi-dev \
+    libscalapack-openmpi-dev \
+    libelpa19
+```
+* cmake:
+```
+sudo apt-get install cmake cmake-qt-gui
+```
+* gnuplot:
+```
+sudo apt-get install gnuplot gnuplot-x11 gnuplot-doc
+```
+* git:
+```
+sudo apt-get install git
+```
+* I installed nvfortran-Compiler from the NVIDIA HPC SDK, v.21.7 or later
+* Download Quantum ESPRESSO: https://gitlab.com/QEF/q-e/-/releases
+* go to QE folder:
+```
+cd q-e-qe-7.6/
+```
+* Configuration
+```
+./configure
+```
+* compiling with 12 cores on my pc:
+```
+ make pwall -j12
+```
+* navigate to the bin folder and get the path using pwd
+* go back to the home folder using cd, then (where XX is the path):
+```
+echo 'export PATH="XX:$PATH"' >> ~/.bashrc
+```
+* The .x files can now be accessed quickly:
+```
+which pw.x
+```
+
+The external Python libraries NumPy, pandas, Matplotlib, scikit-learn, SciPy, and BoltzTraP2 are used for the code implementation.
+To the best of my knowledge, BoltzTrap 2 requires the vtk and pyfftw libraries.
