@@ -1,0 +1,39 @@
+&control
+    calculation = 'scf',
+    prefix = 'nitiB19_conv',
+    pseudo_dir = '../pseudo',
+    outdir = '../tmp_nitiB19_conv',
+/
+&system    
+    ibrav = 0,
+    celldm(1) = 5.128468
+    nat = 4,
+    ntyp = 2,
+    ecutwfc = 67
+    occupations = 'smearing',
+    smearing = 'methfessel-paxton'
+    degauss = 0.01
+/
+&electrons
+    conv_thr = 1.0d-8
+/
+&cell
+    cell_dofree='xyz'
+/
+ATOMIC_SPECIES
+ Ni 58.6934 ni_pbesol_v1.4.uspp.F.UPF
+ Ti 47.867  ti_pbesol_v1.4.uspp.F.UPF
+
+CELL_PARAMETERS alat
+  1.046521785 0.000000000 0.000000000
+ -0.237889594 1.692560578 0.000000000
+  0.000000000 0.000000000 1.489658721
+
+ATOMIC_POSITIONS crystal
+ Ni 0.0409062048 0.6727614904 0.2500000000
+ Ni 0.9590937952 0.3272385096 0.7500000000
+ Ti 0.4120464354 0.2149732116 0.2500000000
+ Ti 0.5879535646 0.7850267884 0.7500000000
+
+K_POINTS automatic
+ 15 15 15 1 1 1
