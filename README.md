@@ -49,7 +49,7 @@ If exactly two bands are specified, the difference between them is also calculat
 In addition to the raw data, CSV files containing the local minima for each path.
 Once the calculations are complete, the data can be plotted.
 
-## Module MODEL
+## Module model
 
 This module was developed to precisely determine the band crossings.
 It was also used to model space curves and to create precise models of band energies.
