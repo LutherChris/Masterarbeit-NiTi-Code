@@ -20,6 +20,12 @@ main_directory = f"/home/chris/nitiB2_uspp_pbesol2.0"
 
 # ##################################################################
 
+# Parallele Berechnung
+
+num_cores = 6
+
+####################################################################
+
 qe_working_directory = main_directory + f"/{prefix}"
 bt2_working_directory = main_directory + f"/tmp_{prefix}"
 
@@ -242,3 +248,13 @@ def delete_folder(path):
             os.unlink(element_path)  # Datei oder Symlink löschen
         elif os.path.isdir(element_path):
             shutil.rmtree(element_path)
+
+# ------------------------------------------------------------------
+# Temporäre Dateien
+# ------------------------------------------------------------------
+
+def path_tmp():
+    path_temp_ = os.path.join(qe_working_directory, "tmp")
+    if not os.path.exists(path_temp_):
+        os.makedirs(path_temp_)
+    return path_temp_

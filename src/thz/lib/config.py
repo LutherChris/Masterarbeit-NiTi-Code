@@ -17,6 +17,11 @@ main_directory = f"/home/chris/nitiB2_uspp"
 #main_directory = f"/home/chris/nitiB2_nc"
 
 ####################################################################
+# Parallele Berechnung
+
+num_cores = 6
+
+####################################################################
 
 qe_working_directory = main_directory + f"/{prefix}"
 bt2_working_directory = main_directory + f"/tmp_{prefix}"
@@ -153,3 +158,13 @@ def load_csv(path, suffix):
     path_data = os.path.join(path, filename)
     df = pd.read_csv(path_data)
     return df
+
+# ------------------------------------------------------------------
+# Temporäre Dateien
+# ------------------------------------------------------------------
+
+def path_tmp():
+    path_temp_ = os.path.join(qe_working_directory, "tmp")
+    if not os.path.exists(path_temp_):
+        os.makedirs(path_temp_)
+    return path_temp_

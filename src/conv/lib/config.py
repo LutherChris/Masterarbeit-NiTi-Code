@@ -20,7 +20,7 @@ main_directory = f"/home/chris/nitiB19_uspp"
 ####################################################################
 # Parallele Berechnung
 
-num_cores = 4
+num_cores = 6
 
 ####################################################################
 qe_working_directory = main_directory + f"/{prefix}"
@@ -68,3 +68,13 @@ def path_result_key(key):
     resultname_ = f"{prefix}.{key}"
     path_result_key_ = os.path.join(result_directory_, resultname_)
     return path_result_key_
+
+# ------------------------------------------------------------------
+# Temporäre Dateien
+# ------------------------------------------------------------------
+
+def path_tmp():
+    path_temp_ = os.path.join(qe_working_directory, "tmp")
+    if not os.path.exists(path_temp_):
+        os.makedirs(path_temp_)
+    return path_temp_

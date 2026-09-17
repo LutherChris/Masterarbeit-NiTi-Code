@@ -38,12 +38,12 @@ def change_config_namelist(path_in: str,
             continue       
         new_lines.append(line)
 
-    os.makedirs("tmp", exist_ok=True)
-    new_file = open(f"tmp/{filename}", 'w')
+    tmp_file_path = os.path.join(config.path_tmp(), filename)
+    new_file = open(tmp_file_path, 'w')
     for line in new_lines:
         new_file.write(line)
     new_file.close()
-    shutil.copyfile(f"/home/chris/VS_code/tmp/{filename}", path_in)
+    shutil.copyfile(tmp_file_path, path_in)
 
 def change_config_card(path_in: str,
                        card: str,
@@ -77,12 +77,13 @@ def change_config_card(path_in: str,
             continue
         new_lines.append(file_lines[i])
 
-    os.makedirs("tmp", exist_ok=True)
-    new_file = open(f"tmp/{filename}", 'w')
+    tmp_file_path = os.path.join(config.path_tmp(), filename)
+    new_file = open(tmp_file_path, 'w')
     for line in new_lines:
         new_file.write(line)
     new_file.close()
-    shutil.copyfile(f"/home/chris/VS_code/tmp/{filename}", path_in)
+    shutil.copyfile(tmp_file_path, path_in)
+
 
 # --------------------------------------------------------------------------------------
 # QE-Rechnung und Rückgabe der konvergierten Gesamtenergie
@@ -102,11 +103,13 @@ def energy(path_in: str,
     """
     qe_working_directory = config.qe_working_directory
     num_cores = config.num_cores
-    if num_cores:
-        print(f"Parallele Berechnung mit {num_cores} Kernen")
-        process = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.PIPE)
+
+    if num_cores > 1:
+        print(f"- Parallele Berechnung mit {num_cores} Kernen")
+        process = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.DEVNULL)
     else:
-        process = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.PIPE)
+        process = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.DEVNULL)
+
     process.wait()
     file = open(path_out, "r")
     file_lines = file.readlines()

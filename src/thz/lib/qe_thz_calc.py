@@ -273,12 +273,14 @@ def change_config_kpoints(path_in: str,
         if continue_again == True:
             continue
         new_lines.append(file_lines[i])
-    
-    new_file = open(f"tmp/{filename}", 'w')
+
+    tmp_file_path = os.path.join(config.path_tmp(), filename)
+    new_file = open(tmp_file_path, 'w')
     for line in new_lines:
         new_file.write(line)
     new_file.close()
-    shutil.copyfile(f"/home/chris/VS_code/tmp/{filename}", path_in)
+    shutil.copyfile(tmp_file_path, path_in)
+
 
 def thz_calc(coords: list,
              R: float,
@@ -344,7 +346,14 @@ def thz_calc(coords: list,
     if not os.path.exists(bt2_working_directory):
         os.makedirs(bt2_working_directory)
         log("scf-Rechnung wird durchgeführt", log_file)
-        process_sc = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+
+        num_cores = config.num_cores
+        if num_cores > 1:
+            print(f"- Parallele Berechnung mit {num_cores} Kernen")
+            process_sc = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+        else:
+            process_sc = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+
         process_sc.wait()
         # Inhalt des tmp-Ordners wird in den Ordner path_COPY_directory kopiert
         config.copy_folder(bt2_working_directory, path_COPY_directory)
@@ -358,7 +367,14 @@ def thz_calc(coords: list,
         
         # bands-Rechnung von pw.x wird durchgeführt
         log("bands-Rechnung wird durchgeführt", log_file)
-        process_bands = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
+
+        num_cores = config.num_cores
+        if num_cores > 1:
+            print(f"- Parallele Berechnung mit {num_cores} Kernen")
+            process_bands = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
+        else:
+            process_bands = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
+        
         process_bands.wait()
         log("bands-Rechnung DONE", log_file)
                 

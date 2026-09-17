@@ -6,13 +6,13 @@ To this end, density functional theory calculations of the band structure of NiT
 
 This Python code is divided into five main modules.
 
-| Module    | Usage                                                                |
-| --------- | ---------------------------------------------------------------------|
-| conv      | convergence tests of the self-consistency calculation of QE          |
-| fermi     | plot of energy bands along high-symmetry lines in the Brillouin zone |
-| thz       | investigation of THz environments using `bands.x`                    |
-| model     | calculation and modelling of bands and band differences using `pw.x` |
-| transport | calculation of transport properties using BoltzTrap2                 |
+| Module    | Usage                                                                             |
+| --------- | --------------------------------------------------------------------------------- |
+| conv      | convergence tests of the self-consistency calculation of QE                       |
+| fermi     | plot of energy bands along high-symmetry lines in the Brillouin zone              |
+| thz       | investigation of THz environments using `bands.x`                                 |
+| model     | calculation and modelling of bands and band differences using `pw.x` and `bands.x`|
+| transport | calculation of transport properties using BoltzTrap2                              |
 
 ## Module conv
 
