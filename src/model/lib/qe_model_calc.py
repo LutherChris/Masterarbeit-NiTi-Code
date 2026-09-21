@@ -1227,13 +1227,14 @@ def model_calc(coords: list,
         log("scf-Rechnung wird durchgeführt", log_file)
 
         num_cores = config.num_cores
+        num_pool = config.num_pool
         if num_cores > 1:
             print(f"- Parallele Berechnung mit {num_cores} Kernen")
-            process_sc = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+            process_scf = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
         else:
-            process_sc = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+            process_scf = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
 
-        process_sc.wait()
+        process_scf.wait()
         config.copy_folder(bt2_working_directory, path_COPY_directory)
 
     # kopiere die xml-Datei der scf-Rechnung aus tmp_prefix_COPY nach prefix_out/suffix/scf
@@ -1248,9 +1249,10 @@ def model_calc(coords: list,
     print("----> nscf-Rechnung wird durchgeführt")
 
     num_cores = config.num_cores
+    num_pool = config.num_pool
     if num_cores > 1:
         print(f"- Parallele Berechnung mit {num_cores} Kernen")
-        process_nscf = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_nscf_in} > {path_nscf_out}", shell=True, stdout=subprocess.DEVNULL)
+        process_nscf = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_nscf_in} > {path_nscf_out}", shell=True, stdout=subprocess.DEVNULL)
     else:
         process_nscf = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_nscf_in} > {path_nscf_out}", shell=True, stdout=subprocess.DEVNULL)
 
@@ -1361,9 +1363,10 @@ def calc_mme(p_str: str,
     print("----> bands_x-Rechnung wird durchgeführt")
 
     num_cores = config.num_cores
+    num_pool = config.num_pool
     if num_cores > 1:
         print(f"- Parallele Berechnung mit {num_cores} Kernen")
-        process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
+        process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
     else:
         process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
     

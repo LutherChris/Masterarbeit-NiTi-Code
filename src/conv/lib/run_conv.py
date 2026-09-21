@@ -303,6 +303,7 @@ def run(cfg):
 
             plt.figure(figsize=(FIGWIDTH,FIGWIDTH*HFACTOR))
             smearing = ["gauss", "marzari-vanderbilt", "methfessel-paxton"]
+            #smearing = ["marzari-vanderbilt", "methfessel-paxton"]
             for j in range(len(smearing)):
                 for i in range(len(nk_list)):
                     path_key = f"{smearing[j]}.{nk_list[i]}"

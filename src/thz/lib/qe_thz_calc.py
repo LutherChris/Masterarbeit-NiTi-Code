@@ -348,9 +348,10 @@ def thz_calc(coords: list,
         log("scf-Rechnung wird durchgeführt", log_file)
 
         num_cores = config.num_cores
+        num_pool = config.num_pool
         if num_cores > 1:
             print(f"- Parallele Berechnung mit {num_cores} Kernen")
-            process_sc = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
+            process_sc = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
         else:
             process_sc = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_scf_in} > {path_scf_out}", shell=True, stdout=subprocess.DEVNULL)
 
@@ -369,9 +370,10 @@ def thz_calc(coords: list,
         log("bands-Rechnung wird durchgeführt", log_file)
 
         num_cores = config.num_cores
+        num_pool = config.num_pool
         if num_cores > 1:
             print(f"- Parallele Berechnung mit {num_cores} Kernen")
-            process_bands = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
+            process_bands = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
         else:
             process_bands = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_bands_in} > {path_bands_out}", shell=True, stdout=subprocess.DEVNULL)
         

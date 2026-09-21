@@ -19,8 +19,10 @@ main_directory = f"/home/chris/nitiB19_uspp"
 
 ####################################################################
 # Parallele Berechnung
+# mpirun -np {num_cores} pw.x -npool {num_pool} -in ... > ...
 
-num_cores = 6
+num_cores = 6   #-np    : Anzahl der physischen Prozessorkerne
+num_pool = 3       #-npool : Anzahl der verknüpften Prozessorkerne
 
 ####################################################################
 qe_working_directory = main_directory + f"/{prefix}"

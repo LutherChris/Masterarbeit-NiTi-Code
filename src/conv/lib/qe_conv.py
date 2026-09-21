@@ -102,11 +102,12 @@ def energy(path_in: str,
         energy:     konvergierte Gesamtenergie der out-Datei von QE
     """
     qe_working_directory = config.qe_working_directory
-    num_cores = config.num_cores
 
+    num_cores = config.num_cores
+    num_pool = config.num_pool
     if num_cores > 1:
         print(f"- Parallele Berechnung mit {num_cores} Kernen")
-        process = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.DEVNULL)
+        process = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_in} > {path_out}", shell=True, stdout=subprocess.DEVNULL)
     else:
         process = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_in} > {path_out}", shell=True, stdout=subprocess.DEVNULL)
 
