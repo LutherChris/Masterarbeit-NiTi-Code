@@ -6,14 +6,14 @@ import shutil
 # ##################################################################
 
 #prefix = "nitiB2_model"
-#prefix = "nitiB2_modelMME"
-prefix = "nitiB2_point2A"
+prefix = "nitiB2_modelMME"
+#prefix = "nitiB2_point2A"
 
 # ##################################################################
 
 # PBEsol_precision - ultra-soft-pseudo-potential uspp
-#main_directory = f"/home/chris/nitiB2_uspp"
-main_directory = f"/home/chris/nitiB2_uspp_pbesol2.0"
+main_directory = f"/home/chris/nitiB2_uspp"
+#main_directory = f"/home/chris/nitiB2_uspp_pbesol2.0"
 
 # PBEsol_nc - non-conserving nc
 #main_directory = f"/home/chris/nitiB2_nc"

@@ -41,8 +41,8 @@ def run(cfg):
     plt.axhline(0, color="black")
     plt.ylabel(f"$E-E_f$ [eV]")
     plt.xlabel(r"$\vec{k}$-Werte")
-    plt.xticks(cfg.x_coordinates, cfg.x_labels)
-    plt.tick_params(axis='both',which='both',bottom=False,left=True,top=False)
+    #plt.xticks(cfg.x_coordinates, cfg.x_labels)
+    #plt.tick_params(axis='both',which='both',bottom=False,left=True,top=False)
 
     # uspp_bands_01
     #plt.ylim(-7, 4)

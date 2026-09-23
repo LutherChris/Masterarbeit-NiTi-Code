@@ -21,7 +21,7 @@ def open_bands_and_split(path):
     for i in range(len(f_lines)):
         if f_lines[i] == '\n':
             j.append(i)
-    df = pd.read_csv(path, sep='\s+', header=None, skip_blank_lines=False)
+    df = pd.read_csv(path, sep='\\s+', header=None, skip_blank_lines=False)
     df_list = [df[:j[0]]]
     for i in range(len(j)-1):
         df_list.append(df[j[i]+1 : j[i+1]])

@@ -1362,14 +1362,7 @@ def calc_mme(p_str: str,
     # führe bands_x Rechnung aus
     print("----> bands_x-Rechnung wird durchgeführt")
 
-    num_cores = config.num_cores
-    num_pool = config.num_pool
-    if num_cores > 1:
-        print(f"- Parallele Berechnung mit {num_cores} Kernen")
-        process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && mpirun -np {num_cores} pw.x -npool {num_pool} -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
-    else:
-        process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && pw.x -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
-    
+    process_bands_x = subprocess.Popen(f"cd {qe_working_directory} && bands.x -in {path_bands_x_in} > {path_bands_x_out}", shell=True, stdout=subprocess.DEVNULL)
     process_bands_x.wait()
     log("bands_x-Rechnung DONE", log_file)
 
@@ -1688,13 +1681,14 @@ def mme_to_df(p_str: str,
     kx_list = []
     ky_list = []
     kz_list = []
+
     for i in range(nks):
         # nehme nur Einträge mit einem Leitungsband
         if v_bands[i] == nbnd-1:
             # Zeilen der Blöcke "1","2","3"
             px_data = data[indis_1[i]+1: indis_2[i]]
             py_data = data[indis_2[i]+1: indis_3[i]]
-            if i == nks: # Beim letzten Block bis zum letzten Eintrag
+            if i == nks-1: # Beim letzten Block bis zum letzten Eintrag
                 pz_data = data[indis_3[i]+1: len(data)]
             else:
                 pz_data = data[indis_3[i]+1: indis_1[i+1]-1]

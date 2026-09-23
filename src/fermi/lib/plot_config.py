@@ -7,8 +7,8 @@ SAVE = True
 
 # Größe der Figur plt.figure(figsize=(FIGWIDTH,FIGWIDTH*HFACTOR))
 TEXTWIDTH_CM = 15.5
-FIGWIDTH = 0.5 * TEXTWIDTH_CM / 2.54  # Umrechnung in Zoll für matplotlib
-HFACTOR = 0.6
+FIGWIDTH = 1 * TEXTWIDTH_CM / 2.54  # Umrechnung in Zoll für matplotlib
+HFACTOR = 0.4
 
 # Name der Datei zum Speichern der Abbildung
 DATEIENNAME = "pseudo_2-0_02"

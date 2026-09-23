@@ -5,7 +5,7 @@ from matplotlib.transforms import Bbox
 # Plot im Fenster Anzeigen?
 SHOW = True
 # Plots speichern?
-SAVE = True
+SAVE = False
 # Name der Datei zum Speichern der Abbildung
 DATEIENNAME = "path_v2.0"
 # Titel in manchen Plots aktivieren?
