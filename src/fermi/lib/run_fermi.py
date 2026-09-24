@@ -18,6 +18,7 @@ cfg.plot_fermilevel     (bool) Soll das Fermi-Niveau geplottet werden?
 cfg.x_coordinates       (list) Koordinaten des Pfades 
                                 z.B. [0, 0.5000, 1.0000, 1.7071, 2.5731]
 cfg.x_labels            (list) Koordinatenbezeichnungen des Pfades
+cfg.y_lim               (list) Y-Achse wird nur im Berich y_lim[0] undy_lim[1] geplottet (in eV)
 """
 
 def run(cfg):
@@ -41,19 +42,13 @@ def run(cfg):
     plt.axhline(0, color="black")
     plt.ylabel(f"$E-E_f$ [eV]")
     plt.xlabel(r"$\vec{k}$-Werte")
-    #plt.xticks(cfg.x_coordinates, cfg.x_labels)
-    #plt.tick_params(axis='both',which='both',bottom=False,left=True,top=False)
 
-    # uspp_bands_01
-    #plt.ylim(-7, 4)
+    if cfg.x_labels:
+        plt.xticks(cfg.x_coordinates, cfg.x_labels)
+        plt.tick_params(axis='both',which='both',bottom=False,left=True,top=False)
 
-    # uspp_bands_02
-    plt.ylim(-2, 2)
-
-    #plt.ylim(-1.4, 1.4)
-    #plt.xlim(0.5, 1.9)
-    #plt.ylim(-1.5, -0.5)
-    #plt.xlim(0.8, 1.2)
+    if cfg.y_lim:
+        plt.ylim(cfg.y_lim[0], cfg.y_lim[1])
 
     if SAVE:
         plt.savefig(f"{DATEIENNAME}.jpg")

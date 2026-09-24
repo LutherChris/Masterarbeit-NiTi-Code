@@ -3,7 +3,7 @@
 # Plot im Fenster Anzeigen?
 SHOW = True
 # Plots speichern?
-SAVE = True
+SAVE = False
 
 # Größe der Figur plt.figure(figsize=(FIGWIDTH,FIGWIDTH*HFACTOR))
 TEXTWIDTH_CM = 15.5

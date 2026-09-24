@@ -7,7 +7,8 @@ import os.path
 #prefix = "nitiB2_fermi"
 #prefix = "nitiB2_fermi_2"
 #prefix = "nitiB2_point2A"
-prefix = "nitiB19_fermi_p1_1"
+#prefix = "nitiB19_fermi_p1_1"
+prefix = "nitiB19_testpfad"
 
 
 # ##################################################################
