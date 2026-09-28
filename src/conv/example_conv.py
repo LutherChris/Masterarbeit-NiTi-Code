@@ -2,34 +2,34 @@ import numpy as np
 from lib.run_conv import run
 
 # ###################################################################################
-# Parameter der Konvergenz
+# Parameters of convergence
 # ###################################################################################
 
 diff_value = 2 # in meV
 
 # -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "ecutwfc"
+# Convergence regarding "ecutwfc"
 # -----------------------------------------------------------------------------------
 ecutwfc = False
 cutoff_list = np.arange(20,51,1)
 #print(cutoff_list)
 
 # -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "K_POINTS automatic"
+# Convergence regarding "K_POINTS automatic"
 # -----------------------------------------------------------------------------------
 kpoints = False
 nk_list_K_POINTS = np.arange(2, 23, 1)
 #print(nk_list_K_POINTS)
 
 # -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "celldm"
+# Convergence regarding "celldm"
 # -----------------------------------------------------------------------------------
 celldm = False
 celldm_list = np.arange(5.5627, 5.6628, 0.1)
 #print(celldm_list)
 
 # -----------------------------------------------------------------------------------
-# Konvergenz bzgl. Smearing
+# Convergence regarding Smearing
 # -----------------------------------------------------------------------------------
 smearing = False
 #key_smearing = "gauss"
@@ -40,7 +40,7 @@ nk_list_smearing = [18, 19, 20]
 #print(degauss_list)
 
 # ###################################################################################
-# Plotten und Analysieren
+# Plotting and analyzing
 # ###################################################################################
 
 plot = False

@@ -24,7 +24,7 @@ main_directory = f"/home/chris/nitiB2_uspp"
 # mpirun -np {num_cores} pw.x -npool {num_pool} -in ... > ...
 
 num_cores = 6   #-np    : Anzahl der physischen Prozessorkerne
-num_pool = 3       #-npool : Anzahl der verknüpften Prozessorkerne
+num_pool = 3    #-npool : Anzahl der verknüpften Prozessorkerne
 
 ####################################################################
 
