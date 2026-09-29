@@ -14,6 +14,8 @@ This Python code is divided into five main modules.
 | model     | calculation and modelling of bands and band differences using `pw.x` and `bands.x`|
 | transport | calculation of transport properties using BoltzTrap2                              |
 
+Detailed tutorials can be found in the tutorials folder.
+
 ## Module conv
 
 This module is used to perform the convergence tests of the self-consistency calculation of QE.

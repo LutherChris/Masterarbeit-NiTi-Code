@@ -4,18 +4,12 @@ import os.path
 # Hier werden die Pfade der Ordner definiert.
 # ##################################################################
 
-#prefix = "nitiB2_conv"
-prefix = "nitiB19_conv"
+prefix = "nitiB2_conv"
 
 # ##################################################################
 
 # PBEsol_precision - ultra-soft-pseudo-potential uspp
-#main_directory = f"/home/chris/nitiB2_uspp"
-#main_directory = f"/home/chris/nitiB2_uspp_pbesol2.0"
-main_directory = f"/home/chris/nitiB19_uspp"
-
-# PBEsol_nc - non-conserving nc
-#main_directory = f"/home/chris/nitiB2_nc"
+main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/nitiB2_uspp"
 
 ####################################################################
 # Parallele Berechnung

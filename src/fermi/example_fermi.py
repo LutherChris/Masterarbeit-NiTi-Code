@@ -7,6 +7,7 @@ from lib.run_fermi import run
 gnufile = "nitiB2_fermi.dat.gnu"
 fermi_energy = 16.5866
 plot_fermilevel = True
+y_lim = [-2, 2]
 x_coordinates = [0, 0.5000, 1.0000, 1.7071, 2.5731]
 x_labels = ["$\\Gamma$", "X", "M", "$\\Gamma$", "R"]
 

@@ -1,6 +1,17 @@
 
 # Tutorial for conv
 
+* This tutorial uses a NiTi calculation as an example.
+  The Quantum Espresso input files are located in the `examples/nitiB2_uspp/nitiB2_conv` folder.
+  To begin, we define the variables in the config.py file (`Masterarbeit-NiTi-Code/src/conv/lib`).
+  In my case:
+```
+prefix = "nitiB2_conv"
+main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/nitiB2_uspp"
+num_cores = 6
+num_pool = 3
+```
+
 * This module is used to perform the convergence of the self-consistency calculation.
   The total energy is calculated based on the following QE parameters:
   * the namelist parameter ecutwfc
@@ -8,7 +19,7 @@
   * the namelist parameter celldm(1)
   * the namelist parameter degauss for various smearing methods and nk
 
-* Please open the Python file `example_conv.py`.
+* Please open the Python file `Masterarbeit-NiTi-Code/src/conv/example_conv.py`.
 
 * The blocks are activated via main variables with the same names.
   The variation of the QE parameters is defined via lists.
@@ -20,7 +31,7 @@
 
 * When the program is executed, the QE input file is modified for each list entry.
   The QE calculation is then performed, and the total converged energy is extracted from the output file.
-  The energies, along with the list entries, are saved as a CSV file in the subfolder `conv_results` inside the `<prefix>`-Folder.
+  The energies, along with the list entries, are saved as a CSV file in the subfolder `conv_results` inside the `<prefix>=nitiB2_conv`-Folder.
 
 * Convergence with respect to other parameters occurs analogously. 
   Only with smearing must the respective smearing type be manually defined beforehand in the QE input file. 
