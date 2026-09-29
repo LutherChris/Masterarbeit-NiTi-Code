@@ -4,7 +4,7 @@ from lib.run_fermi import run
 # Parameter des Plots
 # ###################################################################################
 
-gnufile = "nitiB2_fermi.dat.gnu"
+gnufile = "B2_fermi.dat.gnu"
 fermi_energy = 16.5866
 plot_fermilevel = True
 y_lim = [-2, 2]

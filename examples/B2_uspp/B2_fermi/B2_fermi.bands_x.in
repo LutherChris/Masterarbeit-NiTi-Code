@@ -1,0 +1,6 @@
+&bands
+ prefix = 'B2_fermi'
+ outdir = '../tmp_B2_fermi'
+ filband='B2_fermi.dat'
+ lsym=.true.
+/

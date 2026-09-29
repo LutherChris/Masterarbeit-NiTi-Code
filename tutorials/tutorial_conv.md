@@ -2,12 +2,12 @@
 # Tutorial for conv
 
 * This tutorial uses a NiTi calculation as an example.
-  The Quantum Espresso input files are located in the `examples/nitiB2_uspp/nitiB2_conv` folder.
+  The Quantum Espresso input files are located in the `examples/B2_uspp/B2_conv` folder.
   To begin, we define the variables in the config.py file (`Masterarbeit-NiTi-Code/src/conv/lib`).
   In my case:
 ```
-prefix = "nitiB2_conv"
-main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/nitiB2_uspp"
+prefix = "B2_conv"
+main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
 num_cores = 6
 num_pool = 3
 ```
@@ -31,7 +31,7 @@ num_pool = 3
 
 * When the program is executed, the QE input file is modified for each list entry.
   The QE calculation is then performed, and the total converged energy is extracted from the output file.
-  The energies, along with the list entries, are saved as a CSV file in the subfolder `conv_results` inside the `<prefix>=nitiB2_conv`-Folder.
+  The energies, along with the list entries, are saved as a CSV file in the subfolder `conv_results` inside the `<prefix>=nB2_conv`-Folder.
 
 * Convergence with respect to other parameters occurs analogously. 
   Only with smearing must the respective smearing type be manually defined beforehand in the QE input file. 
