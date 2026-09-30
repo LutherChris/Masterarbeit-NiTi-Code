@@ -155,28 +155,8 @@ Some plots have configuration options that, along with all other variables, are 
 
 # Parameters of thz - calc
 
-The following explains all the parameters of the module:
 Main parameters for activating the code blocks are `highlighted`.
 * (list) means Python lists and NumPy arrays together
-
-This file loads cfg parameters from, for example, nitiB2_thz_calc_uspp_punkt1.py and activates different sections:
-
-- Definition of paths
-- Plot of paths
-- Calculation of paths
-- Loading and analysis of data
-
-General information:
-
-- pw.x is used to calculate bands along different paths.
-- The paths are orthogonal to a unit vector u.
-- The initial vector is: R*u + v + r*a
-- v = displacement vector
-- a = unit vector for the initial path
-- Additional paths are defined by rotating the initial vector in the plane orthogonal to u.
-- a and u must be orthogonal.
-
-Main parameters for activating the code blocks are `highlighted`
   
 ### Definition of paths
 
@@ -213,17 +193,7 @@ Main parameters for activating the code blocks are `highlighted`
 | `analysis`       | (bool)    | Activates the loading and analysis of the data  | False    |
 | bandnumbers      | (list)    | List of bands selected for the plot<br>- If exactly two bands are chosen, the difference is calculated.<br>- Note: counting starts at 0. | [14, 15]  |
 
-
-
 # Parameters for thz -- plot
-
-This file loads cfg parameters from, for example, nitiB2_thz_plot_uspp_punkt1.py and activates different sections:
-
-- Tricontour and trisurf plots
-- Plot of bands along one of the paths
-- Plot depending on the rotation angle
-- Plot depending on R
-- 3D plot depending on R and phi
 
 Main parameters for activating the code blocks are `highlighted`
 
