@@ -1,14 +1,8 @@
 import os
 import os.path
 
-# Hier werden die Pfade der Ordner definiert.
 # ##################################################################
-
 prefix = "B2_fermi"
-
-# ##################################################################
-
-# PBEsol_precision - ultra-soft-pseudo-potential uspp
 main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
 
 ####################################################################

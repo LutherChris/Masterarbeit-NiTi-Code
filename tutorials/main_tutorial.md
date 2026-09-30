@@ -77,7 +77,7 @@ These documents contain descriptions of all variables as well as explanations us
 
 ```
 Masterarbeit-NiTi-Code/                   <main_cirectory>/
-├── src/                                        ├── <prefix>
+├── src/                                        ├── <prefix>/
     ├── conv/                                   |   ├── <prefix>.scf.in
     |   ├── lib/                                |   ├── <prefix>.nscf.in
     |   |   ├── config.py                       |   ├── <prefix>.scf.out

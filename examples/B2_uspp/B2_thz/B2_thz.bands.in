@@ -1,0 +1,32 @@
+&control
+    calculation = 'bands'
+    prefix = 'B2_thz'
+    pseudo_dir = '../pseudo'
+    outdir = '../tmp_B2_thz'
+/
+&system    
+    ibrav = 1
+    celldm(1) = 5.6127
+    nat = 2
+    ntyp = 2
+    ecutwfc = 46
+    occupations = 'smearing'
+    smearing = 'methfessel-paxton'
+    degauss = 0.01
+    nbnd = 18
+/
+&electrons
+    conv_thr = 1.0d-8
+/
+ATOMIC_SPECIES
+ Ni 58.6934 ni_pbesol_v1.4.uspp.F.UPF
+ Ti 47.867  ti_pbesol_v1.4.uspp.F.UPF
+
+ATOMIC_POSITIONS alat
+ Ni 0.0 0.0 0.0
+ Ti 0.5 0.5 0.5
+
+K_POINTS {crystal_b}
+ 2
+ 0.27712812921102037 0.27712812921102037 0.27712812921102037 99
+ 0.317952958257 0.317952958257 0.195478471118 99

@@ -3,25 +3,11 @@ import os.path
 import shutil
 import pandas as pd
 
-# Hier werden die Pfade der Ordner definiert.
 # ##################################################################
-
-prefix = "nitiB2_thz"
-
-####################################################################
-
-# PBEsol_precision - ultra-soft-pseudo-potential uspp
-main_directory = f"/home/chris/nitiB2_uspp"
-
-# PBEsol_nc - non-conserving nc
-#main_directory = f"/home/chris/nitiB2_nc"
-
-####################################################################
-# Parallele Berechnung
-# mpirun -np {num_cores} pw.x -npool {num_pool} -in ... > ...
-
-num_cores = 6   #-np    : Anzahl der physischen Prozessorkerne
-num_pool = 3       #-npool : Anzahl der verknüpften Prozessorkerne
+prefix = "B2_thz"
+main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
+num_cores = 6
+num_pool = 3 
 
 ####################################################################
 

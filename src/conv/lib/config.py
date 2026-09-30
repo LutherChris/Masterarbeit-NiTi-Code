@@ -1,22 +1,11 @@
 import os
 import os.path
 
-# Hier werden die Pfade der Ordner definiert.
 # ##################################################################
-
 prefix = "B2_conv"
-
-# ##################################################################
-
-# PBEsol_precision - ultra-soft-pseudo-potential uspp
 main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
-
-####################################################################
-# Parallele Berechnung
-# mpirun -np {num_cores} pw.x -npool {num_pool} -in ... > ...
-
-num_cores = 6   #-np    : Anzahl der physischen Prozessorkerne
-num_pool = 3       #-npool : Anzahl der verknüpften Prozessorkerne
+num_cores = 6 
+num_pool = 3
 
 ####################################################################
 qe_working_directory = main_directory + f"/{prefix}"
