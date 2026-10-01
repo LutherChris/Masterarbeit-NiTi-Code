@@ -152,7 +152,6 @@ The following sections enable the generation of various plots:
 Some plots have configuration options that, along with all other variables, are listed and described in the tabular overview below.
 
 
-
 # Parameters of thz - calc
 
 Main parameters for activating the code blocks are `highlighted`.

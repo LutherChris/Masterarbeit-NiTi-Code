@@ -4,15 +4,8 @@ import os.path
 # Hier werden die Pfade der Ordner definiert.
 # ##################################################################
 
-prefix = "nitiB2_transport"
-
-# ##################################################################
-
-# PBEsol_precision - ultra-soft-pseudo-potential uspp
-main_directory = f"/home/chris/nitiB2_uspp"
-
-# PBEsol_nc - non-conserving nc
-#main_directory = f"/home/chris/nitiB2_nc"
+prefix = "B2_transport"
+main_directory = "/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
 
 ####################################################################
 qe_working_directory = main_directory + f"/{prefix}"

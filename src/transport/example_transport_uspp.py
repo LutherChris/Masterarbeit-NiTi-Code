@@ -2,13 +2,6 @@ import numpy as np
 # -----------------------------------------------------------------------------------
 from lib.run_transport import run
 
-# Standartwerte
-plot_T_list, plot_mu_list = None, None
-xlim_values, ylim_values = None, None
-trace = True
-plot_T, plot_mu = None, None
-plot_m, cv_perT_vs_T = None, False
-
 # -----------------------------------------------------------------------------------
 # Interpolation(en) durch BoltzTrap2
 fermipm, erange, margin = None, None, None
