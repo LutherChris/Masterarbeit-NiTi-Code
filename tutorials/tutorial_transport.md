@@ -44,7 +44,7 @@ T_list = np.arange(10, 430, 10)
   In this example, it is created in the `tmp_B2_transport` folder. 
   * The bands are selected using the `fermipm` parameter. 
   * All bands within the interval $[-\text{fermipm}, +\text{fermipm}]$ are fully selected. No clipping of the bands occurs.
-    The default setting `fermipm=None` defines a value of $(15 \cdot k_{B} \cdot \max(\text{T\_list}))$.
+    The default setting `fermipm=None` defines a value of $15 \cdot k_{B} \cdot$ max(T_list).
 * Following the interpolation, the transport properties are calculated. 
   Calculating the density of states (DOS) via BoltzTrap2 requires an `erange` parameter.
   This specifies which interval around the Fermi energy is used to calculate the density of states. 
@@ -53,7 +53,7 @@ T_list = np.arange(10, 430, 10)
   This serves as the domain of definition for the chemical potential.
   The margin value must always be smaller than erange; otherwise, the chemical potential will be empty.
   At the same time, margin should not be 0, as calculation errors occur at the edge of the density of states. 
-  * The default setting (`margin=None`) is defined as $(10 \cdot k_{B} \cdot \max(\text{T\_list}))$
+  * The default setting (`margin=None`) is defined as $10 \cdot k_{B} \cdot$ max(T_list)$
 
 ## Plots
 
