@@ -31,7 +31,8 @@ $$f(x,y,z) = \sum_{i+j+k \le p} a_{ijk} \cdot x^{i}y^{j}z^{k} + \sum_{n=1}^{f} \
 
 - First part: simple polynomials in $x, y, z$
 - Second part is a Fourier expansion consisting of 8 combinations of sine and cosine:
-  $$\begin{align*} \sum_{n=1}^{f} ( & b_{n,1}\cos(\phi_{x})\cos(\phi_{y})\cos(\phi_{z}) + b_{n,2}\cos(\phi_{x})\cos(\phi_{y})\sin(\phi_{z}) \\ + & b_{n,3}\cos(\phi_{x})\sin(\phi_{y})\cos(\phi_{z}) + b_{n,4}\sin(\phi_{x})\cos(\phi_{y})\cos(\phi_{z}) \\ + & b_{n,5}\cos(\phi_{x})\sin(\phi_{y})\sin(\phi_{z}) + b_{n,6}\sin(\phi_{x})\cos(\phi_{y})\sin(\phi_{z}) \\ + & b_{n,7}\sin(\phi_{x})\sin(\phi_{y})\cos(\phi_{z}) + b_{n,8}\sin(\phi_{x})\sin(\phi_{y})\sin(\phi_{z}) ) \end{align*}$$
+
+$$\begin{align*} \sum_{n=1}^{f} ( & b_{n,1}\cos(\phi_{x})\cos(\phi_{y})\cos(\phi_{z}) + b_{n,2}\cos(\phi_{x})\cos(\phi_{y})\sin(\phi_{z}) \\ + & b_{n,3}\cos(\phi_{x})\sin(\phi_{y})\cos(\phi_{z}) + b_{n,4}\sin(\phi_{x})\cos(\phi_{y})\cos(\phi_{z}) \\ + & b_{n,5}\cos(\phi_{x})\sin(\phi_{y})\sin(\phi_{z}) + b_{n,6}\sin(\phi_{x})\cos(\phi_{y})\sin(\phi_{z}) \\ + & b_{n,7}\sin(\phi_{x})\sin(\phi_{y})\cos(\phi_{z}) + b_{n,8}\sin(\phi_{x})\sin(\phi_{y})\sin(\phi_{z}) ) \end{align*}$$
 
 - $s$ = symmetry factor
 - $k = \frac{2\pi}{L}$ = wavenumber
