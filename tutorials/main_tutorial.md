@@ -31,12 +31,12 @@
   These files and folders are defined via the functions and variables in `config.py`.
   The following variables need to be defined manually:
 
-| Variable           | Meaning                                                             |
-| ------------------ | --------------------------------------------------------------------|
-| <main_directory>   | main folder path for the calculations and results                   |
-| <prefix>           | subdirectory path for the Quantum Espresso input-files              |
-| <num_cores>        | number of cores for parallel calculations (mpirun -np {num_cores})  |
-| <num_pool>         | number of linked processor cores (-npool {num_pool})                |
+| Variable | Meaning |
+| --- | ---
+| <main_directory> | main folder path for the calculations and results |
+| <prefix> | subdirectory path for the Quantum Espresso input-files |
+| <num_cores> | number of cores for parallel calculations (mpirun -np {num_cores}) |
+| <num_pool> | number of linked processor cores (-npool {num_pool}) |
 
 * A folder `pseudo` containing the pseudopotentials should be located in the `main_directory` folder.
 * The Quantum Espresso (QE) input-files are located inside the prefix-folder.
@@ -66,13 +66,13 @@ outdir = '../tmp_<prefix>'
 For clarity, the tutorials for each module are explained in different documents.
 These documents contain descriptions of all variables as well as explanations using examples.
 
-| Module    | Tutorial                          |
-| ----------| ----------------------------------|
-| conv      | tutorial_conv.md                  |
-| fermi     | tutorial_fermi.md                 |
-| thz       | tutorial_thz.md                   |
-| model     | tutorial_model.md                 |
-| transport | tutorial_transport.md             |
+| Module | Tutorial |
+| --- | --- |
+| conv | tutorial_conv.md |
+| fermi | tutorial_fermi.md |
+| thz | tutorial_thz.md |
+| model | tutorial_model.md |
+| transport | tutorial_transport.md |
 
 
 ```

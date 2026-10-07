@@ -3,13 +3,13 @@ import numpy as np
 from lib.run_thz_calc import run
 
 # -----------------------------------------------------------------------------------
-# Definition der Pfade
+# Definition of the paths
 # -----------------------------------------------------------------------------------
 
 u = (1, 0, 0)
-u = u / np.linalg.norm(u) # Normierung
+u = u / np.linalg.norm(u)
 a = (0,1,0)
-a = a / np.linalg.norm(a) # Normierung
+a = a / np.linalg.norm(a)
 v = (0, 0, 0)
 r = 0.2
 
@@ -20,21 +20,21 @@ minangle = 0
 maxangle = 360
 
 # -----------------------------------------------------------------------------------
-# Plot der Pfade
+# Plot of the paths
 # -----------------------------------------------------------------------------------
 plot_coords = False
 
 # -----------------------------------------------------------------------------------
-# Berechnung der Pfade
+# Calculating the paths
 # -----------------------------------------------------------------------------------
 calc = False
 datlabel = "point1"
 
 # -----------------------------------------------------------------------------------
-# Laden und Analyse der Daten
+# Loading and analyzing the data
 # -----------------------------------------------------------------------------------
 analysis = False
-bandnumbers = [14,15] # Achtung: Zählung beginnt bei 0
+bandnumbers = [14,15] # Attention: Counting starts at 0
 
 # -----------------------------------------------------------------------------------
 decimals = 12

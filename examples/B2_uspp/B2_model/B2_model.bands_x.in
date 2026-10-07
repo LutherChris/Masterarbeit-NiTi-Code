@@ -1,0 +1,7 @@
+&bands
+ prefix = 'B2_model',
+ outdir = '../B2_model_tmp'
+ lp = .true.
+ filp = 'B2_model_p_avg.dat'
+ lsym = .false.
+/

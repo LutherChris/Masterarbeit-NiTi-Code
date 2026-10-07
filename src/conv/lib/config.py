@@ -4,7 +4,7 @@ import os.path
 # ##################################################################
 prefix = "B2_conv"
 main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
-num_cores = 6 
+num_cores = 6
 num_pool = 3
 
 ####################################################################

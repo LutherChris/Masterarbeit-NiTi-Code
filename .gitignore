@@ -3,7 +3,10 @@ __pycache__/
 venv/
 .venv/
 .vscode/
-tmp
+*tmp*
 *niti*
 temp_mu.py
 *sync*
+*out*
+*CRASH*
+*log*

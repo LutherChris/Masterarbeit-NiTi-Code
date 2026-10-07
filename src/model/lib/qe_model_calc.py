@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import xml.etree.ElementTree as ET
 import filecmp
+import math
 from BoltzTraP2 import units
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from sklearn.decomposition import PCA
@@ -1626,16 +1627,28 @@ def mme_to_df(p_str: str,
     """
     # Laden der Ordner-Struktur
     path_p_avg = config.path_p_avg_copy(datlabel, p_str, n_str) # main_directory/prefix_out/suffix/prefix_p_avg.dat
+    path_bands_x_in_copy = config.path_bands_x_in_copy(datlabel, p_str, n_str) # main_directory/prefix_out/suffix/prefix.bands_x.in
 
-    print(f"Pfad der p_avg-Datei: {path_p_avg}")
-    print()
+    # Überprüfe, ob der QE Patch dft2pk verwendet wird
+    dft2pk = False
+    with open(path_bands_x_in_copy, "r") as txt_file:
+        for line in txt_file:
+            lines = line.strip()
+            # Leerzeichen und Punkte entfernen
+            lines = lines.lower().replace(" ", "").replace(".", "")
+            if "lallp=true" in lines:
+                print(f"----> dft2pk Parameter lallp=true in Eingabedatei {path_bands_x_in_copy} gefunden - EXTRAHIERE ALLE MME.")
+                dft2pk = True
+   
+    print(f"----> Pfad der p_avg-Datei: {path_p_avg}")
+
     data = []
     # Extrahieren der Zahlen für jede Zeile des Datafiles
     with open(path_p_avg, 'r') as txt_file:
-        for line in txt_file:
+        for p_line in txt_file:
             # ersetze Zeichen, dient dazu die erste Zeile richtig einzulesen
-            line = line.replace("=", " ").replace(",", " ")
-            parts = line.split()
+            p_line = p_line.replace("=", " ").replace(",", " ")
+            parts = p_line.split()
             numbers = []
             for p in parts:
                 # alles außer Zahlen wird ignoriert.
@@ -1645,81 +1658,160 @@ def mme_to_df(p_str: str,
                     continue
             data.append(numbers)
 
-    nbnd = int(data[0][0])
-    print(f"Anzahl der Bänder: {nbnd}")
+    if dft2pk:
+        # Daten 
+        nbnd = int(data[0][0])
+        nks = int(data[0][1])
+        print(f"----> Anzahl der Bänder: {nbnd}")
+        print(f"----> Anzahl der k-Punkte: {nks}")
 
-    k_points = [] # k-Punkte
-    v_bands = [] # Nummern der äußeren Valenzbänder
-    indis_1 = [] # Zeilennummern mit 1er-Zeilen
-    indis_2 = [] # Zeilennummern mit 2er-Zeilen
-    indis_3 = [] # Zeilennummern mit 3er-Zeilen
-    for i, line in enumerate(data):
-        # prüft, ob mindestens ein Elemet der Zeile > 1 ist
-        if any(n>=1 for n in line):
-            # prüft, ob Länge der Liste genau 4 ist
-            if len(line) == 4:
-                k_points.append(line[0:3])
-                v_bands.append(line[3])
-            elif line[0] == 1.0:
-                indis_1.append(i)
-            elif line[0] == 2.0:
-                indis_2.append(i)
-            elif line[0] == 3.0:
-                indis_3.append(i)
+        block = math.ceil(2*nbnd/6) # Anzahl der Zeilen pro Datenblock
+        line0 = 1                   # Zeile mit k-Koordinaten
+        line1 = line0+1             # Zeile mit 1 (kx)
+        line2 = line1+nbnd*block+1  # Zeile mit 2 (ky)
+        line3 = line2+nbnd*block+1  # Zeile mit 3 (kz)
 
-    nks = len(k_points)
-    print(f"Anzahl der k-Punkte: {nks}")
+        # Konsistenzprüfung
+        len_rows = 1 + nks * (1 + 3 * (1 + nbnd * block))
+        if len(data) != len_rows:
+            raise ValueError("----> Anzahl erwarteter Zeilen passt nicht. Fehler in der Funktion mme_to_df()")
+        if len(data[4]) != 6:
+            raise ValueError(f"----> Die Breite der Blöcke passt nicht: {len(data[4])} != 6")
+        
+        k_points = []  # k-Punkte
+        nbnd_occ = []  # Anzahl der besetzten Bänder
+        re_k = []      # Realteile aller k-Punkte
+        im_k = []
+        for k in range(nks):
+            k_points.append(data[line0][0:3])  # k-Punkte
+            nbnd_occ.append(data[line0][3])    # Anzahl der besetzten Bänder
 
-    # Prüfe ob die Länge der Listen genauso lange wie die Anzahl der k-Punkte ist
-    if not (len(k_points) == len(v_bands) == len(indis_1) == len(indis_2) == len(indis_3)):
-        raise ValueError("Nicht alle k-Punkte extrahiert. Irgendwo ist ein Fehler.")
+            re_p = [] # Realteil aller p-Richtungen 
+            im_p = []
+            for linep in (line1, line2, line3):
+                lineb = linep+1     # Erste Zeile eines p-Plocks
+                re_b = []           # Realteile aller Bänder
+                im_b = []
+                for b in range(nbnd):
+                    b_line = lineb+b*block  # Erste Zeile eines Blocks
+                    re_b_b= []      # Realteile eines Bandes zum Nächsten
+                    im_b_b = []     # Imaginärteile eines Bandes
+                    for b_b in range(block):
+                        b_b_line = b_line+b_b
+                        re_b_b.extend(data[b_b_line][::2])   
+                        im_b_b.extend(data[b_b_line][1::2])
+                    re_b.append(re_b_b)
+                    im_b.append(im_b_b)
+                re_p.append(re_b)
+                im_p.append(im_b)
+            re_k.append(re_p)
+            im_k.append(im_p)
+            line0 = line3+nbnd*block+1
+            line1 = line0+1
+            line2 = line1+nbnd*block+1
+            line3 = line2+nbnd*block+1
 
-    # Extrahiere alle interessanten Matrix-Elemte
-    px_list = []
-    py_list = []
-    pz_list = []
-    kx_list = []
-    ky_list = []
-    kz_list = []
+        # Pandas Dataframe erstellen
+        keys = ['kx', 'ky', 'kz', 'nbnd_occ']
+        for p in ['px', 'py', 'pz']:
+            for i in range(nbnd):
+                for j in range(nbnd):
+                    keys.append(f"{p}_re_{i+1}-{j+1}")
+                    keys.append(f"{p}_im_{i+1}-{j+1}")
 
-    for i in range(nks):
-        # nehme nur Einträge mit einem Leitungsband
-        if v_bands[i] == nbnd-1:
-            # Zeilen der Blöcke "1","2","3"
-            px_data = data[indis_1[i]+1: indis_2[i]]
-            py_data = data[indis_2[i]+1: indis_3[i]]
-            if i == nks-1: # Beim letzten Block bis zum letzten Eintrag
-                pz_data = data[indis_3[i]+1: len(data)]
+        df_rows = []
+        for k in range(nks):
+            row = [k_points[k][0], k_points[k][1], k_points[k][2], int(nbnd_occ[k])]
+            for p in range(3):
+                for i in range(nbnd):
+                    for j in range(nbnd):
+                        row.append(re_k[k][p][i][j])
+                        row.append(im_k[k][p][i][j])           
+            df_rows.append(row)
+
+        # 3. Pandas DataFrame erzeugen
+        df = pd.DataFrame(df_rows, columns=keys)
+        print(f"----> DataFrame erfolgreich erstellt! Shape: {df.shape}")
+
+    else:
+        print(f"----> EXTRAHIERE MME ohne dft2pk Patch.")
+
+        nbnd = int(data[0][0])
+        nks = int(data[0][1])
+        print(f"----> Anzahl der Bänder: {nbnd}")
+        print(f"----> Anzahl der k-Punkte: {nks}")
+        line0=1  # Zeile mit k-Koordinaten
+
+        # Konsistenzprüfung
+        if len(data[4]) != 5:
+            raise ValueError(f"----> Die Breite der Blöcke passt nicht: {len(data[4])} != 6")
+        
+        k_points = [] # k-Punkte
+        nbnd_occ_list = [] # Anzahl der besetzten Bänder
+        avg_k = []    # Betragsquadrat aller k-Punkte
+        nbnd_free_list = []
+        for k in range(nks):
+            k_points.append(data[line0][0:3])  # k-Punkte  
+            nbnd_occ = data[line0][3]
+            nbnd_occ_list.append(nbnd_occ)     # Anzahl der besetzten Bänder
+            nbnd_free = int(nbnd - nbnd_occ)   # Anzahl der Leitungsbänder
+            nbnd_free_list.append(nbnd_free)
+            if nbnd_free >=1:
+                block = math.ceil(nbnd_occ/5)
             else:
-                pz_data = data[indis_3[i]+1: indis_1[i+1]-1]
-            # alle Zahlen in eine Liste
-            px_numbers = np.concatenate(px_data)
-            py_numbers = np.concatenate(py_data)
-            pz_numbers = np.concatenate(pz_data)
-            # Wähle letzten Eintrag
-            px_list.append(px_numbers[-1])
-            py_list.append(py_numbers[-1])
-            pz_list.append(pz_numbers[-1])
-            # k-Punkte in Listen
-            k_point = k_points[i]
-            kx_list.append(k_point[0])
-            ky_list.append(k_point[1])
-            kz_list.append(k_point[2])
+                block = 0
 
-    print(f"Anzahl der k-Punkte mit einem einzigen Leitungsband: {len(kx_list)}")
+            line1 = line0+1
+            line2 = line1+nbnd_free*block+1
+            line3 = line2+nbnd_free*block+1
+            avg_p = [] # Betragsquadrat aller p-Richtungen
+            for linep in (line1, line2, line3):
+                lineb = linep+1
+                avg_b = []
+                if nbnd_free >=1:
+                    for b in range(nbnd_free):
+                        b_line = lineb+b*block
+                        avg_b_b = []
+                        for b_b in range(block):
+                            b_b_line = b_line+b_b
+                            avg_b_b.extend(data[b_b_line])
+                        avg_b.append(avg_b_b)
+                    else:
+                        []
+                avg_p.append(avg_b)
+            avg_k.append(avg_p)
+            line0 = line3+nbnd_free*block+1
 
-    # Erstelle pandas-Dataframe
-    df = pd.DataFrame({
-        "kx": kx_list,
-        "ky": ky_list,
-        "kz": kz_list,
-        "px": px_list,
-        "py": py_list,
-        "pz": pz_list,
-    })
+        nbnd_free_max = max(nbnd_free_list)
+   
+        # Pandas Dataframe erstellen
+        keys = ["kx", "ky", "kz", "nbnd_occ"]
+        for p in ["px", "py", "pz"]:
+            for i in range(nbnd - nbnd_free_max, nbnd):
+                for j in range(nbnd - nbnd_free_max):
+                    keys.append(f"{p}_{j+1}-{i+1}")
+        print(keys)
 
+        df_rows = []
+        for k in range(nks):
+            row = [k_points[k][0], k_points[k][1], k_points[k][2], int(nbnd_occ_list[k])]
+            current_nbnd_occ = nbnd_occ_list[k]
+            
+            for p in range(3):
+                for i in range(nbnd - nbnd_free_max, nbnd):
+                    for j in range(nbnd - nbnd_free_max):
+                        relative_i = int(i - current_nbnd_occ)
+                        if relative_i >= 0:
+                            row.append(avg_k[k][p][relative_i][j])
+                        else:
+                            row.append(None)
+            df_rows.append(row)
+        df = pd.DataFrame(df_rows, columns=keys)
+        print(df)
+        print(f"----> DataFrame erfolgreich erstellt! Shape: {df.shape}")
+        
     return df
-
+    
 # --------------------------------------------------------------------------------------
 # Berechnung statistischer Größen für die Matrix-Impuls-Elemente
 # --------------------------------------------------------------------------------------

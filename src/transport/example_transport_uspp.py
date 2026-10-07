@@ -3,7 +3,7 @@ import numpy as np
 from lib.run_transport import run
 
 # -----------------------------------------------------------------------------------
-# Interpolation(en) durch BoltzTrap2
+# Interpolation(s) by BoltzTraP2
 fermipm, erange, margin = None, None, None
 calc = False
 # -----------------------------------------------------------------------------------
@@ -13,76 +13,76 @@ bins_values = [3000]
 T_list = np.arange(10, 430, 10)
 
 # -----------------------------------------------------------------------------------
-# Plots der Transportgrößen
+# Plots of transport quantities
 plot = True
 # -----------------------------------------------------------------------------------
 bins = 3000
 
-# Seebeck-Koeffizient vs. chemisches Potential
+# Seebeck coefficient vs. chemical potential
 Y_name="seebeck"; X_name="mu"; plot_m_list=[80]; plot_T_list=[50, 100, 200, 330, 400]
 #Y_name="seebeck"; X_name="mu"; plot_m_list=[10, 20, 30, 40, 50, 60, 70, 80]; plot_T_list=[200]
 
-# Seebeck-Koeffizient vs. Temperatur
+# Seebeck coefficient vs. temperature
 #Y_name="seebeck"; X_name="T"; plot_m_list=[80]
 #Y_name="seebeck"; X_name="T"; plot_m_list=m_values
 
-# Seebeck-Koeffizient vs. m 
+# Seebeck coefficient vs. m 
 #Y_name="seebeck"; X_name="m"; plot_m_list=m_values
 #Y_name="seebeck"; X_name="m"; plot_m_list=m_values; plot_T=400
 #Y_name="seebeck"; X_name="m"; plot_m_list=m_values; plot_T=50
 
 # -----------------------------------------------------------------------------------
-# Wärmekapazität vs. chemisches Potential
+# Heat capacity vs. chemical potential
 #Y_name="cv"; X_name="mu"; plot_m_list=[80]; plot_T_list=[10, 50, 100, 200, 330, 400]
 #Y_name="cv"; X_name="mu"; plot_m_list=m_values
 
-# Wärmekapazität vs. Temperatur
+# Heat capacity vs. temperature
 #Y_name="cv"; X_name="T"; plot_m_list=[80]
 #Y_name="cv"; X_name="T"; plot_m_list=m_values
 
-# Wärmekapazität/Tempertatur vs. Temperatur
+# Heat capacity/temperature vs. temperature
 #cv_perT_vs_T = True; plot_m=80
 
-# Wärmekapazität vs. m 
+# Heat capacity vs. m 
 #Y_name="cv"; X_name="m"; plot_m_list=m_values
 #Y_name="cv"; X_name="m"; plot_m_list=m_values; plot_T=400
 
 #--------------------------------------------------------------------
-# Leitfähigkeit pro Streurate vs. chemisches Potential
+# Conductivity per scattering rate vs. chemical potential
 #Y_name="sigma"; X_name="mu"; plot_m_list=[80]; plot_T_list=[10, 50, 100, 200, 330, 400]
 #Y_name="sigma"; X_name="mu"; plot_m_list=m_values
 
-# Leitfähigkeit pro Streurate vs. Temperatur
+# Conductivity per scattering rate vs. temperature
 #Y_name="sigma"; X_name="T"; plot_m_list=[80]
 #Y_name="sigma"; X_name="T"; plot_m_list=[5, 10, 20, 30, 40, 50, 60, 70, 80]
 
-# Leitfähigkeit pro Streurate vs m 
+# Conductivity per scattering rate vs m
 #Y_name="sigma"; X_name="m"; plot_m_list=m_values
 #Y_name="sigma"; X_name="m"; plot_m_list=m_values; plot_T=400
 
 #--------------------------------------------------------------------
-# Wärmeleitfähigkeit pro Streurate vs. chemisches Potential
+# Thermal conductivity per scattering rate vs. chemical potential
 #Y_name="kappa"; X_name="mu"; plot_m_list=[80]; plot_T_list=[10, 50, 100, 200, 330, 400]
 #Y_name="kappa"; X_name="mu"; plot_m_list=m_values
 
-# Wärmeleitfähigkeit pro Streurate vs. Temperatur
+# Thermal conductivity per scattering rate vs. temperature
 #Y_name="kappa"; X_name="T"; plot_m_list=[80]
 #Y_name="kappa"; X_name="T"; plot_m_list=m_values
 
-# Wärmeleitfähigkeit pro Streurate vs m 
+# Thermal conductivity per scattering rate vs m
 #Y_name="kappa"; X_name="m"; plot_m_list=m_values
 #Y_name="kappa"; X_name="m"; plot_m_list=m_values; plot_T=400
 
 #--------------------------------------------------------------------
-# Hall-Koeffizient vs. chemisches Potential
+# Hall coefficient vs. chemical potential
 #Y_name="hall"; X_name="mu"; plot_m_list=[80]; plot_T_list=[10, 50, 100, 200, 330, 400]
 #Y_name="hall"; X_name="mu"; plot_m_list=m_values
 
-# Hall-Koeffizient pro Streurate vs. Temperatur
+# Hall coefficient per scattering rate vs. temperature
 #Y_name="hall"; X_name="T"; plot_m_list=[80]
 #Y_name="hall"; X_name="T"; plot_m_list=[5, 10, 20, 30, 40, 50, 60, 70, 80]
 
-# Hall-Koeffizient pro Streurate vs m 
+# Hall coefficient per scattering rate vs m
 #Y_name="hall"; X_name="m"; plot_m_list=m_values
 Y_name="hall"; X_name="m"; plot_m_list=m_values; plot_T=400
 

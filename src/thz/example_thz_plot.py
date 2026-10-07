@@ -3,10 +3,10 @@ import numpy as np
 from lib.run_thz_plot import run
 
 # ###################################################################################
-# Parameter aus der Berechnung
+# Parameters from the calculation
 # ###################################################################################
 a = (0,1,0)
-a = a / np.linalg.norm(a) # Normierung
+a = a / np.linalg.norm(a)
 r = 0.2
 
 R_list = np.arange(0.33, 0.371, 0.00125)
@@ -31,7 +31,7 @@ ylim_values_contourplot = None
 
 
 # -----------------------------------------------------------------------------------
-# Plot der Bänder entlang eines der Pfade
+# Plot of the bands along one of the paths
 # -----------------------------------------------------------------------------------
 plotbands = False
 deg = 45
@@ -42,19 +42,19 @@ ylim_values_plotbands = None
 #ylim_values_plotbands = (-0.06, 0.06)
 
 # -----------------------------------------------------------------------------------
-# Plot in Abhängigkeit des Rotationswinkels
+# Plot as a function of the rotation angle
 # -----------------------------------------------------------------------------------
 plot_vs_phi = False
 
 # -----------------------------------------------------------------------------------
-# Plot in Abhängigkeit von R
+# Plot as a function of R
 # -----------------------------------------------------------------------------------
 plot_vs_R = False
 philabel = True
 symmetry = 4
 thz_area_R = False
 # -----------------------------------------------------------------------------------
-# 3D - Plot in Abhängigkeit von R und phi
+# 3D - Plot as a function of R and phi
 # "diff"     "bands"     "R"
 # -----------------------------------------------------------------------------------
 plot_vs_phi_R = False

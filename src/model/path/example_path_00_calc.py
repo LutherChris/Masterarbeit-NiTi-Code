@@ -2,13 +2,13 @@ import os
 import sys
 import numpy as np
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) # Erweitert den Arbeitsbereich von Python auf parallele Ordner.
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from lib.run_model_calc import run
 
-# ---------------------------------------------------------------------------------------
-# feste Parameter aus der Schnittpunkte und Pfad-Berechnung
-# ---------------------------------------------------------------------------------------
-# Schnittpunkte-Berechnung
+# --------------------------------------------------------------------------------------
+# fixed parameters from the intersection and path calculation
+# --------------------------------------------------------------------------------------
+# from Intersection calculation (sect)
 u = (1, 0, 0)
 u = u / np.linalg.norm(u)
 a = (0,1,0)
@@ -18,79 +18,70 @@ R = 0.34547436
 r = 0.2
 phi_steps = 48
 bandnumbers = (14, 15)
-# Schnittpunkt der Bänder bei der Fermi-Energie
 zero = (R, 0.11871832, 0.11871832)
 
-# #######################################################################################
-# Haupt-Parameter zur Aktivierung der Blöcke
-# #######################################################################################
+# ######################################################################################
+# main parameters for activating the blocks
+# ######################################################################################
 
-# 1. Berechnung des Gitters ist dauerhaft aktiv
-# 2. Plot des Gitters
 plot_grid = False
-# 3. Berechnung der Bandenergien durch Quantum Espresso
 calc_dft = False
-# 4. Berechnung der Matrix-Impuls-Elemente durch QE
 calc_mme = False
-# 5. Berechnung, Analyse und Anpassung der Dataframes
 analysis = False
-# ---------------------------------------------------------------------------------------
-# 6. Laden der pandas-Dataframe
 load_csv = False
-# 7. Modellierung mit Schleife über alle Ordnungen
 calc_model = False
 
-# #######################################################################################
-
-# ---------------------------------------------------------------------------------------
-# Parameter für 1. Berechnung des Gitters
-# ---------------------------------------------------------------------------------------
-# Berechnungen am Schnittpunkt, Gitterdefinition zur Pfadsuche
-k0=zero; p=0.012; n=11; grid_type="regular"; datlabel="punkt1_000"; rotation=False
-# ---------------------------------------------------------------------------------------
-# grundlegende Prameter für 5. und 7. 
-# ---------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# basic parameters for 5th and 7th block.
+# --------------------------------------------------------------------------------------
 # Energie, an dem die Berechnungen durchgeführt werden 
 energy="diff"
 
 # verwendete Koordinatenachsen für Analysis und Modellierung    
 coord_system="xyz"
 
-# ---------------------------------------------------------------------------------------
-# Parameter für 5. Berechnung, Analyse und Anpassung der Dataframes
-# ---------------------------------------------------------------------------------------
-# Hauptkomponentenanalyse
+# --------------------------------------------------------------------------------------
+# parameters for 1st block: calculation of the grid
+# --------------------------------------------------------------------------------------
+# ======================================================================================
+# Berechnungen am Schnittpunkt, Gitterdefinition zur Pfadsuche
+k0=zero; p=0.012; n=11; grid_type="regular"; datlabel="punkt1_000"; rotation=False
+
+# ======================================================================================
+
+# --------------------------------------------------------------------------------------
+# parameters for 5th block: calculation, analysis and adjustment of the data frames
+# --------------------------------------------------------------------------------------
+# principal component analysis
 pca=False
 
-# Entfernung von 0-Werten aus den Daten
+# removal of zero values ​​from the data
 no_000=False
 
-# Filterung des Dataframes auf den THz-aktiven Bereich
+# filtering the data frame to the THz-active area
 cut_df_for_fit=False
 cut_value_diff=0.0124; cut_value_bands=0.05; complete_cut=True
 
-# Berechnung der statistischen Werte der Matrix-Impuls-Elemente
+# calculation of the statistical values ​​of the matrix momentum elements
 mme_statistics=False
 merge_decimals=5
 
-# Berechnung des Schnittpunktes
+# calculating the intersection point
 find_intersection=False
 intersect_point="point_1"
 
-# ---------------------------------------------------------------------------------------
-# Parameter für 7. Modellberechnung
-# ---------------------------------------------------------------------------------------
-#  0-te Polynom-Ordnungen weglassen?
+# --------------------------------------------------------------------------------------
+# parameters for model calculation
+# --------------------------------------------------------------------------------------
+#  Should omit the 0th order of the polynomial?
 no_a0 = False
 
-# Maximale Anzahl an Koeffizienten
+# maximum number of coefficients
 max_coeffs = 10000
 
-# Konfiguration
-# HINWEIS: hier sollte nochmal alles spezifisch wichtige für das jeweilige Modell festgelegt sein, auch wenn es einige Parameter wie energy und coord_system usw von oben überschreibt.
+# --------------------------------------------------------------------------------------
 
-
-# Zu berechnende Ordnungen
+# orders to be calculated
 p_order_list = []
 f_order_list = []
 l_order_list = []
@@ -99,17 +90,17 @@ p1_order_list = []
 p2_order_list = []
 p3_order_list = []
 
-# Anpassung des (einzigen!) konstanten Koeffizienten
+# adjustment of the (only!) constant coefficient
 a0_correction = False
 
-# Ridge-Lösungsverfahren anstatt linearer Regression
+# Ridge solution method instead of linear regression
 ridgeCV = False 
 ridge_alphas = np.logspace(-6, 2, 9) 
 
-# Spaltenskalierung der Design-Matrix
+# column scaling of the design matrix
 col_weighting = True
 
-# Speichern der Fehler als csv-Datei
+# saving the errors as a CSV file
 save_errors = False
 
 if __name__ == "__main__":

@@ -2,29 +2,12 @@ import os
 import os.path
 import shutil
 
-# Hier werden die Pfade der Ordner definiert.
 # ##################################################################
 
-#prefix = "nitiB2_model"
-prefix = "nitiB2_modelMME"
-#prefix = "nitiB2_point2A"
-
-# ##################################################################
-
-# PBEsol_precision - ultra-soft-pseudo-potential uspp
-main_directory = f"/home/chris/nitiB2_uspp"
-#main_directory = f"/home/chris/nitiB2_uspp_pbesol2.0"
-
-# PBEsol_nc - non-conserving nc
-#main_directory = f"/home/chris/nitiB2_nc"
-
-# ##################################################################
-
-# Parallele Berechnung
-# mpirun -np {num_cores} pw.x -npool {num_pool} -in ... > ...
-
-num_cores = 6   #-np    : Anzahl der physischen Prozessorkerne
-num_pool = 3    #-npool : Anzahl der verknüpften Prozessorkerne
+prefix = "B2_model"
+main_directory = "/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
+num_cores = 6
+num_pool = 3
 
 ####################################################################
 
@@ -223,6 +206,13 @@ def path_p_avg_copy(datlabel, p, n):
     path_out_directory_ = path_out_directory(datlabel, p, n)
     path_filename_p_avg_ = os.path.join(path_out_directory_, filename_p_avg)
     return path_filename_p_avg_
+
+def path_bands_x_in_copy(datlabel, p, n):
+    # main_directory/prefix_out/suffix/prefix.bands_x.in
+    filename_bands_x_in_copy = f"{prefix}.bands_x.in"
+    path_out_directory_ = path_out_directory(datlabel, p, n)
+    path_filename_bands_x_in_out_ = os.path.join(path_out_directory_, filename_bands_x_in_copy)
+    return path_filename_bands_x_in_out_
  
 # ##################################################################
 # Hilfsfunktionen zum kopieren und Löschen von Ordnern

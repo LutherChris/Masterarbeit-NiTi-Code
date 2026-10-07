@@ -11,7 +11,7 @@ main_directory = f"/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
 ```
 
 * This small module plots the band structure from a Gnuplot file from QE; it does not perform the calculations.
-  The SCF calculation (`calculation = 'scf'`) and NSCF calculation (`calculation = 'bands'`) must first be performed manually using `pw.x` via the terminal.
+  The SCF calculation (QE: `calculation = 'scf'`) and NSCF calculation (QE: `calculation = 'bands'`) must first be performed manually using `pw.x` via the terminal.
 * Open the terminal in the folder containing the QE input files.
   Then start the QE calculations via the terminal.
   I use 6 cores, 3 of which are connected.
@@ -36,6 +36,10 @@ bands.x < B2_fermi.bands_x.in > B2_fermi.bands_x.out
 ```
 * The numbers after `coordinate` are the position of the x-axis labels of the band energy diagram, defined in the configuration file of the fermi module (`Masterarbeit-NiTi-Code/src/fermi/example_fermi.py`)
 ```
+gnufile = "B2_fermi.dat.gnu"
+fermi_energy = 16.5866
+plot_fermilevel = True
+y_lim = [-2, 2]
 x_coordinates = [0, 0.5000, 1.0000, 1.7071, 2.5731]
 x_labels = ["$\\Gamma$", "X", "M", "$\\Gamma$", "R"]
 ```
@@ -43,19 +47,5 @@ x_labels = ["$\\Gamma$", "X", "M", "$\\Gamma$", "R"]
 ```
 grep -e 'Fermi energy' -e estimated B2_fermi.scf.out
 ```
-* Other parameters of the module are listed below.
-  When the program is executed, the band energy is plotted along the path.
-
-## Parameters of fermi
-
-The following explains all the parameters of the module. `(list)` means Python lists or NumPy arrays.
-
-
-| Parameter | Data Type | Description | Example |
-| --- | --- | --- | --- |
-| gnufile                | (str)   | Filename of the gnuplot file from QE | "B2_fermi.dat.gnu" |
-| fermi_energy           | (float) | Fermi energy from QE                 | 16.8868 |
-| plot_fermilevel        | (bool)  | Should the Fermi level be plotted?   | True |
-| x_coordinates          | (list)  | Path coordinates of the high-symmetry-points | [0, 0.5000, 1.0000, 1.7071, 2.5731] |
-| x_labels               | (list)  | Path coordinate labels               | ["$\\Gamma$", "X", "M", "$\\Gamma$", "R"] |
-| y_lim                  | (list)  | Y-axis is only plotted within the range of y_lim[0] and y_lim[1] (in eV) | [-2.0, 2.0] |
+* The other parameters of the module are listed in `parameters/parameteters_of_fermi/parameters_fermi.md`.
+* When the program is executed, the band energy is plotted along the path.
