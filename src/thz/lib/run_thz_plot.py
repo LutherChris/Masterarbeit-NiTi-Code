@@ -4,71 +4,7 @@ import lib.config as config
 import lib.qe_thz_plot as plot
 from lib.plot_config import PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. nitiB2_thz_plot_uspp_punkt1.py und aktiviert verschiedene Abschnitte:
-- Tricontour und trisurf-Plots
-- Plot der Bänder entlang eines der Pfade
-- Plot in Abhängigkeit des Rotationswinkels
-- Plot in Abhängigkeit von R
-- 3D - Plot in Abhängigkeit von R und phi
-
-# ===================================================================================
-# Übersicht aller Parameter
-# ===================================================================================
-
-# -----------------------------------------------------------------------------------
-# Parameter aus der Berechnung
-# -----------------------------------------------------------------------------------
-cfg.a           (list) (ax, ay, az) - Einheitsvektor für Anfangspfad, der orthogonal zu u liegt
-cfg.r           (float) Radius für den Einheitsvektor a
-cfg.nks_list    (list) Liste verschiedener nks-Werte
-                        nks: (int) Anzahl der Datenpunkte pro Pfad
-cfg.R_list      (list) Liste verschiedener R-Werte
-                        R: (float) Radius für den Einheitsvektor u
-cfg.phi_steps   (int) Anzahl der Zwischenpfade zwischen 0° und 180°
-cfg.datlabel    (str) extra Label in Dateienname, um Rechnungen zu unterscheiden
-
-# -----------------------------------------------------------------------------------
-# Tricontour und trisurf-Plots
-# -----------------------------------------------------------------------------------
-cfg.contourplot             (bool) aktiviert Tricontour oder trisurf-Plots
-cfg.plottype_contourplot    (str) zur Unterscheidung des Plottyps; möglich sind:
-                                "tricontour_diff"     "tricontour_band0"    "tricontour_band1"    "tricontour_limit_diff"
-                                "trisurf_diff"        "trisurf_band0"       "trisurf_band1"       "trisurf_all_bands"
-cfg.levels                  (int) Anzahl der Positionslinien im Plot
-cfg.peaks                   (bool) Sollen auch die Peaks als Punkte geplottet werden?
-cfg.xlim_values_contourplot (tupel) Einschränkung der Plots auf einen Bereich der X-Achse
-cfg.ylim_values_contourplot (tupel) Einschränkung der Plots auf einen Bereich der y-Achse
-
-# -----------------------------------------------------------------------------------
-# Plot der Bänder entlang eines der Pfade
-# -----------------------------------------------------------------------------------
-cfg.plotbands               (bool) Aktivierung des Plots entlang der Pfade
-cfg.deg                     (float) Plottet den Pfad in der kx-Ebene, welcher am nächsten am Winkel deg (in °) liegt
-cfg.sym                     (bool) mit sym=True wird auch der um 180° gedrehte gegenüberliegende Pfad geplottet
-cfg.xlim_values_plotbands   (tupel) Einschränkung der Plots auf einen Bereich der X-Achse
-cfg.ylim_values_plotbands   (tupel) Einschränkung der Plots auf einen Bereich der y-Achse
-
-# -----------------------------------------------------------------------------------
-# Plot in Abhängigkeit des Rotationswinkels
-# -----------------------------------------------------------------------------------
-cfg.plot_vs_phi         (bool) aktiviert Plot in Abhängigkeit des Rotationswinkels
-
-# -----------------------------------------------------------------------------------
-# Plot in Abhängigkeit von R
-# -----------------------------------------------------------------------------------
-cfg.plot_vs_R           (bool) aktiviert Plot in Abhängigkeit von R
-cfg.philabel            (bool) Sollen die globalen Mimima farbig in die Legende geplottet werden?
-cfg.symmetry            (int) Symmetrie der Daten (für Label der globalen Minima)
-cfg.thz_area_R          (bool) Datenpunkte werden nach der THz-Bedingung gefiltert
-# -----------------------------------------------------------------------------------
-# 3D - Plot in Abhängigkeit von R und phi
-# -----------------------------------------------------------------------------------
-cfg.plot_vs_phi_R       (bool) aktiviert den 3D-Plot
-cfg.plottype_phi_R      (str) zur Unterscheidung des Plottyps; möglich sind:
-                            "diff"     "bands"     "R"
-cfg.thz_area_3D         (bool) Datenpunkte werden nach der THz-Bedingung gefiltert
-"""
+# --------------------------------------------------------------------------------------
 
 def run(cfg):
     # Laden der Plot-Einstellungen aus plot_config.py

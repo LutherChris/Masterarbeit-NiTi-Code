@@ -4,22 +4,7 @@ import lib.config as config
 import lib.qe_fermi as bands
 from lib.plot_config import FIGWIDTH, HFACTOR, DATEIENNAME, SHOW, SAVE, PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. nitiB2_fermi_uspp.py zum plotten der Bandstruktur.
-
-# =======================================================================================
-# Übersicht aller Parameter
-# =======================================================================================
-
-cfg.gnufile             (str) Dateiname der gnuplot-Datei von QE
-                                z.B. "nitiB2bands.dat.gnu"
-cfg.fermi_energy        (float) Fermi-Energie aus QE
-cfg.plot_fermilevel     (bool) Soll das Fermi-Niveau geplottet werden?
-cfg.x_coordinates       (list) Koordinaten des Pfades 
-                                z.B. [0, 0.5000, 1.0000, 1.7071, 2.5731]
-cfg.x_labels            (list) Koordinatenbezeichnungen des Pfades
-cfg.y_lim               (list) Y-Achse wird nur im Berich y_lim[0] undy_lim[1] geplottet (in eV)
-"""
+# --------------------------------------------------------------------------------------
 
 def run(cfg):
     # Laden der Plot-Einstellungen aus plot_config.py

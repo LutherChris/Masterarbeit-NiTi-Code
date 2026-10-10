@@ -168,7 +168,8 @@ Meaning of parameter n for different grid types:
 | Parameter | Data type | Description | Example |
 | --- | --- | --- | --- |
 | `mme_statistics` | (bool) | Activates calculation of statistical values for momentum matrix elements | False |
-| merge_decimals | (int) | Number of decimal places used to compare DataFrames | 5 |
+| merge_decimals | (int) | Number of decimal places used to compare DataFrames | 10 |
+| df_key | (str) | quantity on which he statistical calculation is performed | "px_abs2_14-15" |
 
 # Parameters for 7. Model Calculation
 

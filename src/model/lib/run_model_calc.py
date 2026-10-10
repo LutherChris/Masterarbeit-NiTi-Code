@@ -9,228 +9,7 @@ import lib.qe_model_calc as model
 import lib.config as config
 from lib.plot_config import PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. model_uspp_point1_calc.py und führt den folgenden Aufbau aus.
-Abschnitte sind teilweise optional und werden über Parameter aktiviert.
-
-# =======================================================================================
-# grundsätzlicher Aufbau:
-# =======================================================================================
-Hauptparameter: grid_type, rotation, plot_grid 
-1. Berechnung des Gitter mit der Hilfsfunktion (make_grid)
-    - Festlegung des Gitters durch den Parameter cfg.grid_type und entsprechende Funktionsvariablen
-    - Rotation bei bestimmten Gittertypen
-2.  - Plot des Gitters
-
-# ---------------------------------------------------------------------------------------
-Hauptparameter: calc_dft
-3. Berechnung der Bandenergie durch Quantum Espresso
-
-# ---------------------------------------------------------------------------------------
-Hauptparameter: calc_mme
-4. Berechnung der Matrix-Impuls-Elemente (MME) durch Quantum Espresso
-
-# ---------------------------------------------------------------------------------------
-Hauptparameter: analysis
-5. Einlesen der Ausgabe-Dateien und Analyse/Anpassung des Dataframes der Energie und der MME mit den folgenden Hilfsfunktionen:
-    - Hilfsfunktion (make_analysis_energy) zur Berechnung/Analyse/Anpassung des Dataframes der Energie
-        - lädt Daten aus der xml-Datei von Quantum Espresso und speichert diese als pandas-Dataframe
-        - Koordinatentransformationen:
-            - Skalierung des Gitters
-            - Transformation des Gitters in Pfadvektoren
-        - Hauptkomponentenanalyse
-        - Entfernen von 0-Werten aus den Daten (z.B. Koordinatenursprung)
-        - Zuschnitt auf den THz-aktiven Bereich
-    - Hilfsfunktion (make_analysis_mme) zur Berechnung/Analyse/Anpassung des Dataframes der Matrix-Impuls-Elemente
-        - läst Daten aus der Ausgabe-Datei der Quantum Espresso Berechnung und speichert diese als pandas-Dataframe
-        - Berechnung statistischer Größen für die Matrix-Impuls-Elemente
-
-# ---------------------------------------------------------------------------------------
-Hauptparameter: load_scv
-6. Laden der pandas-Dataframes
-
-# ---------------------------------------------------------------------------------------
-Hauptparameter: calc_model
-7. Modellierung mit der Hilfsfunktion (make_model) über alle Ordnungen
-    - Anpassung des (einzigen!) konstanten Koeffizienten
-    - Auswertung des Modells auf dem Gitter und Berechnung der macimalen Fehler an den Gitterpunkten
-
-# =======================================================================================
-# Übersicht aller Parameter
-# =======================================================================================
-- Grundsätzliche Koordinatensysteme:
-k_grid_center:      {x,y,z} = Gitter im Zentrum, egal welche Art des Gitter-Typs
-k_grid:             {kx,ky,kz} = Gitter für Quantum Espresso
-k_grid_rot:         {kx',ky',kz'} = Gedrehtes Gitter für Quantum Espresso
-t_grid:             {t,rho,phi} = Gitter für Polarkoordinaten entlang des Pfades
-v_grid:             {t,vN,vB} = Gitter mit verschobenen Pfaden in N- und B-Richung
-                        vN = Komponente des Normalenvektors
-                        vB = Komponente des Binormalenvektors
-# ---------------------------------------------------------------------------------------
-# feste Parameter
-# ---------------------------------------------------------------------------------------
-# aus thz Untersuchung
-cfg.u:              (list) Einheitsvektor der Ursprungsgerade, um die gedreht wird
-cfg.a:              (list) Einheitsvektor für Anfangspfad, der orthogonal zu u liegt
-cfg.v:              (list) Verschiebevektor für den Anfangspfad
-cfg.R:              (float) Radius für den Einheitsvektor u
-cfg.r:              (float) Radius für den Einheitsvektor a
-cfg.phi_steps:      (int) Anzahl der Zwischenpfade zwischen 0° und 180°
-cfg.bandnumbers:    (list) Auswahl der Bänder für die Auslesung der xml-Datei von QE
-
-# aus der Pfad-Bestimmung
-cfg.coord_basis:    (str) Welches Koordinatensystem wurde bei der Pfad-Bestimmung verwendet?
-                        "xyz" oder "xyz_scaled"
-cfg.a_coeffs:       (list) a-Koeffizienten von r(t)
-cfg.b_coeffs:       (list) b-Koeffizienten von r(t)
-cfg.modeltype_path: (str) Modell des Pfades
-                        "path_point1": Pfad für Punkt1
-                        "path_point2A": Pfad für Punkt2A
-                        "path_point2B": Pfad für Punkt2B
-                        "path_point3": Pfad für Punkt3
-                        "path_point1_center": Pfad für Punkt1 entlang des Zentrums der Schale
-cfg.decimals:       (float) legt fest, auf wie viele Nachkommastellen die QE-Vektoren gerundet werden, standart:12
-# #######################################################################################
-# Haupt-Parameter zur Aktivierung der Blöcke
-# #######################################################################################
-cfg.plot_grid:      (bool) Soll das Gitter geplottet werden?
-cfg.calc_dft:       (bool) aktiviert DFT-Rechnung der Energie durch Quantum Espresso (QE)
-cfg.calc_mme        (bool) aktiviert DFT-Rechnung der Matrix-Impuls-Elemente durch QE
-cfg.analysis:       (bool) aktiviert analysis-Block nach der DFT-Rechnungg
-
-cfg.load_csv:       (bool) aktiviert Laden der csv-Dateien nach der Analyse
-cfg.calc_model:     (bool) aktiverit Modell-Berechnungen
-
-# ---------------------------------------------------------------------------------------
-# grundlegende Prameter für 5. und 7. 
-# ---------------------------------------------------------------------------------------
-cfg.energy:         (str) Energie, an dem die Berechnungen durchgeführt werden
-                        "diff": Energiedifferenz
-                        "band0": unteres Band
-                        "band1": oberes Band
-
-cfg.coord_system:   (str) Wählt bestimmte Achsen des Koordinatensystems aus dem Dataframe, um Berechnungen im Block Analyse und Modellierung durchzuführen
-                "kxyz":       Originales Koordinatensystem - Achsen: ("kx", "ky", "kz")
-                "xyz":        Koordinatensystem im Zentrum - Achsen: ("x", "y", "z")
-                "xyz_scaled": skaliertes Koordinatensystem im Zentrum auf [-1,1] - Achsen: ("x_scaled", "y_scaled", "z_scaled")
-                "path":       Koordinatensysteme entlang des Pfades r(t) - Achsen: ("t", "rho", "phi")
-                "tNB":        Koordinatensystem der verschobenen Pfade r(t)
-
-    Bemerkung: Wenn coord_sytem="path" aber grid_type kein Pfad-Koordinatensystem ist,
-    dann werden die Achsen ("t", "rho", "phi") numerisch durch die Koordinatentransformation berechnet.
-    Dabei werden folgende Parameter verwendet:
-cfg.bounds:         (list) Intervall von t für Suche des Minimums
-cfg.tol:            (float) Toleranz für Nichtorthogonalität
-cfg.xatol:          (flaot) Toleranz in der Suchfunktion des Minimums
-
-# ---------------------------------------------------------------------------------------
-# Parameter für 1. Berechnung des Gitters
-# ---------------------------------------------------------------------------------------
-cfg.k0:             (list) Versatzvektors für das Gitter im Ursprung (zero oder zero_0)
-cfg.p:              (float),(list) Gitterlängen-array bzw. float des Gitters
-cfg.n:              (int),(list) Anzahl-der-Datenpunkte-array bzw. float des Gitters
-cfg.grid_type:      (str) Definiert die Form des Gitters; Beispiel: 
-                        "regular"=kartesisches Gitter
-                        "cylindrical"=Zylindrisches Gitter
-                        "path"=Polargitter entlang des Pfades
-                        "path_grid_semi_regular"=regelmäßiges Gitter aus Verschiebung des Pfades
-                        "path_grid_2B"=Gitter für Punkt2A und Punkt2B
-cfg.datlabel:       (str) Label in Dateienname (Für Ordner und Dateien)
-
-# Rotation des Gitters
-cfg.rotation:       (bool) aktiviert die Rotation des Gitters {x,y,z}->{kx',ky',kz'}
-cfg.u_axis:         (list) bei rotation=True ursprüngliche Hauptachse des k-Gitters zB(0,0,1)
-cfg.a_axis:         (list) bei Rotation=True Zielachse des neuen Gitters zB(0,1,1)
-
-# speziell bei grid_type="cylindrical":
-cfg.z_axis:         (list) Hauptachse des Zylinders
-cfg.phi_sym:        (int) Anzahl der Symmetrie-Sektoren 
-cfg.R_dense:        (float) Radius der radialen Gaus-Dichte
-cfg.r_sigma:        (float) Stärke der radialen Gaus-Dichte
-cfg.n_phi_min:      (int) Minimale Anzahl an phi-Punkten pro Sym.Sektor
-cfg.base_weight:    (float) Basiswert für Dichte außerhalb des Gauß
-
-# speziell bei grid_type="path":
-cfg.path_phi_sym    (int) Anzahl der Symmetrie-Sektoren, keine Symmetrie: {0,1}
-cfg.path_n_phi_min  (int) Minimale Anzahl an phi-Punkten pro Sym.Sektor
-cfg.non_equidistant (float) verschobane Winkel um  non_equidistant*np.sin(np.arange(n_phi))
-cfg.path_rho_dense  (float) Radius der radialen Gaus-Dichte
-cfg.path_rho_sigma  (float) Stärke der radialen Gaus-Dichte
-cfg.path_base_weight(float) Basiswert für Dichte außerhalb des Gauß
-cfg.path_no_rho0    (bool) Punkte mit rho=0 werden nicht definiert
-
-# speziell bei grid_type="path_grid_2B":
-cfg.path_phi_sym    (int) Anzahl der Symmetrie-Sektoren, keine Symmetrie: {0,1}
-cfg.path_phi_sigma  (float) phi-abhängige Gauß-Verdichtung um Punkte 2B in Abhängigkeit von t
-cfg.path_rho_sigma  (float) Stärke der radialen Gaus-Dichte um rho=0 (Punkt2A)
-cfg.path_rho_sigmaB (float) Stärke der radialen Gaus-Dichte um rho=0 (Punkt2A) in Abhängigkeit von t
-cfg.path_no_rho0    (bool) Punkte mit rho=0 werden nicht definiert
-
-# ---------------------------------------------------------------------------------------
-# Parameter für 5. Berechnung, Analyse und Anpassung der Dataframes
-# ---------------------------------------------------------------------------------------
-# Hauptkomponentenanalyse
-cfg.pca:            (bool) aktiviert Hauptkomponentenanalyse im analysis-Block
-
-# Entfernung von 0-Werten aus den Daten
-cfg.no_000:         (bool) aktiviert die Entfernung von 0-Werten aus den Daten
-        wenn coord_system="xyz: entfernt x=y=z=0 aus den Daten vor der Modellierung
-        wenn coord_system="path: entfernt rho=0 aus den Daten vor der Modellierung
-
-# Filterung des Dataframes auf den THz-aktiven Bereich
-cfg.cut_df_for_fit: (bool) aktiviert die Filterung des Dataframes auf den thz-aktiven Bereich
-cfg.cut_value_diff:     (float) THz-Bedingung für die Differenz der Bänder
-cfg.cut_value_bands:    (float) THz-Bedingung für die Bänder
-cfg.complete_cut:       (bool) Die Bänder werden exakt auf die THz-Bedingungen zugeschnitten!
-
-# Berechnung des Schnittpunktes k0
-cfg.find_intersection:  (bool) Soll der Schnittpunkt k0 im Dataframe berechnet werden?
-cfg.intersect_point:    (str) Um welchen Schnittpunkt handelt es sich?
-
-# Berechnung der statistischen Werte der Matrix-Impuls-Elemente
-cfg.mme_statistics:     (bool) aktiviert die Berechnung der statistischen Werte der Matrix-Impuls-Elemente
-cfg.merge_decimals: (int) Anzahl der Nachkommastellen, auf denen die Dataframes miteinander verglichen werden
-
-# ---------------------------------------------------------------------------------------
-# Parameter für 7. Modellberechnung
-# ---------------------------------------------------------------------------------------
-#  0-te Polynom-Ordnungen weglassen?
-cfg.no_a0:          (bool) Soll in den Polynommodellen die 0-te Ordnung weggelassen werden?
-
-# Maximale Anzahl an Koeffizienten
-cfg.max_coeffs:     (int) Maximale Anzahl an Koeffizienten zum Abbruch bei Modellberechnungen
-
-# Konfiguration
-cfg.modeltype:      (str) legt den Modell-Typ fest
-cfg.symmetry:       (int),(None) Symmetriefaktor in den Modell-Funktionen
-
-# Zu berechnende Ordnungen
-cfg.p_order_list:   (list) p-Ordnungen für die Modellberechnungsschleife
-cfg.f_order_list:   (list) f-Ordnungen für die Modellberechnungsschleife
-cfg.l_order_list:   (list) l-Ordnungen für die Modellberechnungsschleife
-cfg.k_order_list:   (list) k-Ordnungen für die Modellberechnungsschleife
-cfg.p1_order_list:  (list) p1-Ordnungen für die Modellberechnungsschleife
-cfg.p2_order_list:  (list) p2-Ordnungen für die Modellberechnungsschleife
-cfg.p3_order_list:  (list) p3-Ordnungen für die Modellberechnungsschleife
-
-# Anpassung des (einzigen!) konstanten Koeffizienten
-cfg.a0_correction:  (bool) Verschiebung der konstanten Ordnung für Energie bei (0,0,0)
-                    Achtung: Funktioniert nur, wenn erster Koeffizient der (einzige!) konstante Term
-
-# Ridge-Lösungsverfahren anstatt linearer Regression
-cfg.ridgeCV:        (bool) aktiviert Ridge-Lösungsverfahren anstatt lineare Regression
-cfg.ridge_alphas:   (list) Liste von alphas im Ridge-Verfahren zum testen
-
-# Spaltenskalierung der Datenmatrix
-cfg.col_weighting:  (bool) aktiviert Spaltenskalierung der Datenmatrix nach GOLUB & VAN LOAN
-
-# Speichern der Fehler als csv-Datei
-cfg.save_errors:    (bool) speichert die Fehler der Modell-Berechnungen
-
-- Modeltypen siehe qe_model_models.py
-- Rotation der Gitter funktioniert in Winkelsystemen nicht, da sie mit einer Matrix rotiert wird und die Anzahl der Datenpunkte pro Achse gleich bleiben muss
-- bei Rotation funktioniert die Gradient und Krümmungsberechnung nicht (pca). Die Numpy-Funktionen benötigen ein regelmäßiges Gitter.
-"""
+# --------------------------------------------------------------------------------------
 
 def run(cfg):
     # Laden der Plot-Einstellungen aus plot_config.py
@@ -343,7 +122,7 @@ def run(cfg):
         print()
         return k_grid, k_grid_center, coords, t_grid, v_grid
 
-    def make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, coord_system, grid_type, coord_basis, pca, no_000, cut_df_for_fit, find_intersection):
+    def make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, coord_system, grid_type, coord_basis, pca, find_intersection):
         """
         - Lade Daten aus der Ausgabe-Dateie der QE-Berechnung 
             df:     xml-file für die Energieberechnung
@@ -398,21 +177,7 @@ def run(cfg):
                 model.model_mean_curv(df, cfg.energy)
             else:
                 raise ValueError("Hauptkomponentenanalyse kann nur in karteschen Gittern berechnet werden.")
-
-        # -------------------------------------------------------------------------------
-        # Entfernung von 0-Werten aus den Daten (optional)
-        # -------------------------------------------------------------------------------
-        if no_000:
-            print(f"- Entfernung von 0-Werte aus den Daten")
-            df = model.model_cut_000(df, coord_system)
-                        
-        # -------------------------------------------------------------------------------
-        # Zuschneiden der Daten auf den THz-aktiven Bereich (optional)
-        # -------------------------------------------------------------------------------
-        if cut_df_for_fit: 
-            print("- Zuschneiden der Daten auf den THz-aktiven Bereich")
-            df = model.model_cut_df_to_thz_range(df, cfg.cut_value_diff, cfg.cut_value_bands, coord_system, cfg.complete_cut)
-        
+                               
         # -------------------------------------------------------------------------------
         # Berechnung des Schnittpunktes
         # -------------------------------------------------------------------------------
@@ -438,13 +203,13 @@ def run(cfg):
         # Prüfe, ob Daten der Matrix-Elemente vorliegen und falls ja, werden sie gelesen
         if os.path.exists(config.path_p_avg_copy(cfg.datlabel, p_str, n_str)):
             print("Lade Daten aus p_avg.dat und speichere als Dataframe (Matrix-Impuls-Elemente)")
-            df_mme = model.mme_to_df(p_str, n_str, cfg.datlabel)
+            df_mme = model.mme_to_df(p_str, n_str, cfg.datlabel, bandnumbers=cfg.bandnumbers)
             # Speichern
             model.model_save_csv(df_mme, p_str, n_str, cfg.datlabel, "df_mme", modeltype)
         else:
             print("Es liegen keine Matrix-Impuls-Elemente als p_avg.dat vor!")
             df_mme = None
-        
+
         # -------------------------------------------------------------------------------
         # Berechnung statistischer Größen für die Matrix-Elemente (optional)
         # -------------------------------------------------------------------------------
@@ -460,8 +225,39 @@ def run(cfg):
 
             # Berechnung statistischer Größen
             print("----> Berechne statistische Größen")
-            model.mme_statistics(df, df_mme, cfg.merge_decimals)
+            model.mme_statistics(df, df_mme, cfg.df_key, cfg.merge_decimals)
+
         return df_mme
+
+    def make_merge_and_cut(df, df_mme, coord_system, cut_df_for_fit, no_000):
+        # -------------------------------------------------------------------------------
+        # Matrix Elemente dem Dataframe der Energie hinzufügen
+        # -------------------------------------------------------------------------------
+        print("- Hinzufügen der Matrix Elemente zum Dataframe der Energie")
+        # Dataframe der Energie zur Sicherheit vorher speichern
+        model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df_energy", modeltype)
+        df = model.merge_df_dfmme(df, df_mme, merge_decimals=cfg.merge_decimals)
+
+        # -------------------------------------------------------------------------------
+        # Entfernung von 0-Werten aus den Daten (optional)
+        # -------------------------------------------------------------------------------
+        if no_000:
+            print(f"- Entfernung von 0-Werte aus den Daten")
+            df = model.model_cut_000(df, coord_system)
+
+        # -------------------------------------------------------------------------------
+        # Zuschneiden der Daten auf den THz-aktiven Bereich (optional)
+        # -------------------------------------------------------------------------------
+        if cut_df_for_fit: 
+            print("- Zuschneiden der Daten auf den THz-aktiven Bereich")
+            df = model.model_cut_df_to_thz_range(df, cfg.cut_value_diff, cfg.cut_value_bands, coord_system, cfg.complete_cut)
+
+        # -------------------------------------------------------------------------------
+        # Speichern
+        # -------------------------------------------------------------------------------
+        model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df", modeltype)
+
+        return df
 
     def make_model(p_str, n_str, df, orders, a0_correction):
         """       
@@ -547,9 +343,9 @@ def run(cfg):
     # Analyse und Anpassung
     # -----------------------------------------------------------------------------------
     if cfg.analysis:
-        df = make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, cfg.coord_system, cfg.grid_type, coord_basis, cfg.pca, cfg.no_000, cfg.cut_df_for_fit, cfg.find_intersection)
+        df = make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, cfg.coord_system, cfg.grid_type, coord_basis, cfg.pca, cfg.find_intersection)
         df_mme = make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cfg.cut_df_for_fit, cfg.mme_statistics)
-        print(len(df))
+        df = make_merge_and_cut(df, df_mme, cfg.coord_system, cfg.cut_df_for_fit, cfg.no_000)
 
     # -----------------------------------------------------------------------------------
     # Laden der pandas-Dataframes
@@ -572,7 +368,7 @@ def run(cfg):
     # -----------------------------------------------------------------------------------
     if cfg.calc_model:
         print("Modellierung")
-        print(f"- Modeltyp: {modeltype} für Energie: {cfg.energy}")
+        print(f"- Modeltyp: {modeltype} für Achse: {cfg.energy}")
         print(f"- maximale Anzahl Koeffizienten: {cfg.max_coeffs}")
         print(f"- Definition des THz-aktiven Bereich: diff<{cfg.cut_value_diff}, E0>-{cfg.cut_value_bands}, E1<{cfg.cut_value_bands}")
 

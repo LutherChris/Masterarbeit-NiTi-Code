@@ -384,6 +384,8 @@ def model_3Dsurface(axis: str,
         e_label = f"$E_0$"
     elif energy == "band1":
         e_label = f"$E_1$"
+    else:
+        e_label = ""
 
     exponenten = {}
     # Datem skalieren

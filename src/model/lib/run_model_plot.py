@@ -8,115 +8,7 @@ import lib.qe_model_plot as plot
 import lib.config as config
 from lib.plot_config import PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. model_uspp_point1_plot.py und führt den folgenden Aufbau aus.
-
-# =======================================================================================
-# Übersicht aller Parameter
-# =======================================================================================
-
-# ---------------------------------------------------------------------------------------
-# Werte aus z.B. nitiB2_model_calc_punkt1.py zum Laden der Dataframes
-# ---------------------------------------------------------------------------------------
-cfg.p:              (float),(list) Gitterlängen-array bzw. float des Gitters
-cfg.n:              (int),(list) Anzahl-der-Datenpunkte-array bzw. float des Gitters
-cfg.grid_type:      (str) Definiert die Form des Gitters
-cfg.datlabel:       (str) Label in Dateienname (Für Ordner und Dateien)
-
-cfg.a_coeffs, cfg.b_coeffs:   (list) Koeffizienten der Raumkurve
-cfg.modeltype_path: (str) Pfadmodell für Koordinatentransformation {t,vN,vB} --> {t,rho,phi}, wenn coord_system="tNB"
-# ---------------------------------------------------------------------------------------
-# Grundlegende Konfiguration
-# ---------------------------------------------------------------------------------------
-# Festlegung der Achsen
-cfg.coord_system:   (str) Definiert das Koordinatensystem, in dem geplottet wird
-                "kxyz":       Originales Koordinatensystem
-                "xyz":        Koordinatensystem im Zentrum
-                "xyz_scaled": skaliertes Koordinatensystem im Zentrum auf [-1,1]
-                "path":       Koordinatensystem entlang des Pfades r(t)
-                "tNB":        Koordinatensystem der verschobenen Pfade r(t)
-
-# Modell und Symmetrie
-cfg.modeltype:  (str) legt den Modell-Typ fest (für Dateienorder)
-cfg.symmetry:   (int),(None) Symmetrie der Daten aus dem Modell-Fit
-cfg.no_a0:          (bool) Wurde im Modell-Fit der erste Koeffizient weggelassen?
-
-# Ordnungen
-p_order:        (int) p-Ordnung des Modells
-f_order:        (int) f-Ordnung des Modells
-l_order:        (int) l-Ordnung des Modells
-k_order:        (int) k-Ordnung des Modells
-p1_order:       (int) p1-Ordnung des Modells
-p2_order:       (int) p2-Ordnung des Modells
-p3_order:       (int) p3-Ordnung des Modells
-
-# ---------------------------------------------------------------------------------------
-# Zuschnitt des Dataframes der Energie
-# ---------------------------------------------------------------------------------------
-
-cfg.thz_cut_diff:   (bool) filtert Differenz der Bänder nach Kriterium < cut_value_diff
-cfg.thz_cut_band0:  (bool) filtert unteres Band nach Kriterium > - cut_value_bands
-cfg.thz_cut_band1:  (bool) filtert oberes Band nach Kriterium < cut_value_bands                
-cfg.cut_value_diff: (float) für die Differenz der Bänder in eV
-cfg.cut_value_bands:(float) für die Bänder in eV
-
-# ---------------------------------------------------------------------------------------
-# Energie-Achse für alle Plots
-cfg.plot_energy_axis    (str) Energie-Achse für alle Plots
-cfg.plot_titel:         (str) Titel des 4D-Plots
-
-# ---------------------------------------------------------------------------------------
-# Slider 2D-Plots
-# ---------------------------------------------------------------------------------------
-cfg.plot_2Dplots:   (bool) aktiviert Plot der 2D-Sliderplots
-cfg.plot_model:     (bool) Sollen die Datenpunkte des Modells geplottet werden?
-cfg.axis_2D:        (str) x-Achse im 2D-Sliderplot     
-cfg.nk_model:       (int) Anzahl der Modellpunkte im 2D-Sliderplot
-cfg.error:          (bool) Zielachse im 2D-Sliderplot sind die Fehler
-
-# ---------------------------------------------------------------------------------------
-# Slider 3D-Plots 
-# ---------------------------------------------------------------------------------------
-cfg.plot_3Dplots:   (bool) aktiviert Plot der 3D-Flächenplots
-cfg.axis_3D:        (str) Achse des Sliders (senkrecht zur geplotteten Ebene)
-
-# ---------------------------------------------------------------------------------------
-# 4D Plots
-# ---------------------------------------------------------------------------------------
-cfg.plot_4Dplots:   (bool) aktiviert 4D-Plots
-cfg.black_plot:     (bool) die Colorbar wird komplett schwarz
-cfg.plot_cube:      (bool) plottet die Ränder des Würfels als Linien
-
-# ---------------------------------------------------------------------------------------
-# 4D Plots_mme_in_thz
-# ---------------------------------------------------------------------------------------
-cfg.plot_4Dplots_mme_in_thz     (bool) aktiviert 4D-Plots der Matrix-Impuls-Elemente
-cfg.merge_decimals              (int),(None) aktiviert die Zuordnung der Koordinatensysteme
-
-# ---------------------------------------------------------------------------------------
-# Plot der Gradienten und der Krümmung
-# ---------------------------------------------------------------------------------------
-cfg.plot_gradient:  (bool) aktiviert Plot des Gradienten
-cfg.plot_curv:      (bool) aktiviert Plot der Krümmungsvektoren
-cfg.step:           (int) Dichte der Gradient und Krümmungsvektoren
-
-# ---------------------------------------------------------------------------------------
-# Plots der Fehler - 2D
-# ---------------------------------------------------------------------------------------
-cfg.plot_errors_2D: (bool) aktiviert Plot der Fehler für verschiedene Modell-Ordnungen
-cfg.axis1:          (str) Order-Achse im Plot; Beispiel: "p_order"
-cfg.max_error_2D:   (float),(None) Filtert das Dataframe vorher nach error_energy < max_error
-cfg.thz_range_2D:   (bool) Plot der Fehler im thz-aktiven Bereich
-
-# ---------------------------------------------------------------------------------------
-# Plots der Fehler - 3D-wireframe
-# ---------------------------------------------------------------------------------------
-cfg.plot_errors_3D:  (bool) aktiviert Plot der Fehler im 3D-wireframe für Modellordnungen
-cfg.axis1_3D:        (str) erste Order-Achse im Plot; Beispiel: "p_order"
-cfg.axis2_3D:        (str) zweite Order-Achse im Plot; Beispiel: "l_order"
-cfg.max_error_3D:    (float),(None) Filtert das Dataframe vorher nach error_energy < max_error
-cfg.thz_range_3D:    (bool) Plot der Fehler im thz-aktiven Bereich
-"""
+# --------------------------------------------------------------------------------------
 
 def run(cfg):
     # Laden der Plot-Einstellungen aus plot_config.py
@@ -215,8 +107,10 @@ def run(cfg):
     # -----------------------------------------------------------------------------------
     if cfg.plot_2Dplots:
         # Laden der Coeffs
-        coeffs = np.array(model.model_load_txt(p_str, n_str, cfg.datlabel, f"coeffs_{cfg.plot_energy_axis}", modeltype))
-        print(len(coeffs))
+        try:
+            coeffs = np.array(model.model_load_txt(p_str, n_str, cfg.datlabel, f"coeffs_{cfg.plot_energy_axis}", modeltype))
+        except:
+            coeffs = None
         # Plot
         plot.model_2Dplots_xyz(cfg.axis_2D, cfg.plot_energy_axis, df_plots, modeltype, coeffs, cfg.nk_model, orders, cfg.plot_model, cfg.symmetry, cfg.error, cfg.coord_system, cfg.modeltype_path, no_a0, a_coeffs, b_coeffs)
     

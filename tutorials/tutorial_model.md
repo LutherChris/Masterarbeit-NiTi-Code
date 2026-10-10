@@ -64,7 +64,7 @@ v = (0, 0, 0)
 R = 0.34547436
 r = 0.2
 phi_steps = 48
-bandnumbers = (14, 15)
+bandnumbers = (14, 15) # Attention: Counting starts at 0
 zero = (0.34547436, 0.11871832, 0.11871832) # Punkt 1
 
 # from path_calculations (path)
@@ -87,12 +87,12 @@ modeltype_path="path_point1"
 ## Main parameters 
 
 ```
-plot_grid = False   # BLOCK 2
-calc_dft = False    # BLOCK 3
-calc_mme = False    # BLOCK 4
-analysis = False    # BLOCK 5
-load_csv = False    # BLOCK 6
-calc_model = False  # BLOCK 7
+plot_grid = False                       # BLOCK 2
+calc_dft = False                        # BLOCK 3
+calc_mme = False; merge_decimals=10     # BLOCK 4
+analysis = False                        # BLOCK 5
+load_csv = False                        # BLOCK 6
+calc_model = False                      # BLOCK 7
 ```
 
 * The next part of the configuration file contains the main parameters to activate sections with `True` or deactivate them with `False`. 
@@ -186,7 +186,7 @@ cut_df_for_fit=False
 cut_value_diff=0.0124; cut_value_bands=0.05; complete_cut=True
 # ------------------------------------------------------------
 mme_statistics=False
-merge_decimals=5
+df_key = "px_abs2_14-15"
 # ------------------------------------------------------------
 find_intersection=False
 intersect_point="point_1"
@@ -215,7 +215,7 @@ intersect_point="point_1"
 	The fundamental shape of the grid is retained. 
 
 * The parameter `mme_statistics` activates the calculation of statistical quantities for the momentum matrix elements.
-  The parameter `merge_decimals` specifies the number of decimal places used to map the coordinates of the MME calculation (file `<prefix>_p_avg.dat`) to the coordinates of the energy calculation. (file `<prefix>_df.csv`) 
+  The parameter `df_key` defines the set in which the statistical calculation is performed.
 
 * The calculation of the nearest intersection point is activated by the parameter `find_intersection`.
   It triggers the function `model_find_intersect` in `qe_model_calc.py`.
@@ -317,8 +317,6 @@ The final configuration parameters do the following:
   It uses the input file prefix_bands_x.in in the folder prefix to calculate the matrix elements using the QE subprogram `bands.x`.
 * IMPORTANT: The code in this section assumes that `calc_dft` was performed before, as `bands.x` requires the correct SCF and NSCF calculation.
   This is verified by a check.
-* IMPORTANT: The current code in the analysis block extracts the momentum matrix elements between the last two bands.
-  This should be taken into account when defining the parameter bandnumbers!
 * The Python code performs the following steps:
   * First, it checks if the XML files of the SCF and NSCF calculations are present in the corresponding folders to ensure that the code block `calc_dft` has already been executed.
   * Then, it checks if the SCF and NSCF files in the folders `<prefix>` and `<prefix>_out/<suffix>` are identical.
@@ -330,7 +328,9 @@ The final configuration parameters do the following:
 
 * After the DFT calculation, the analysis block (`analysis=True`) reads the Quantum Espresso XML files and saves the relevant information as a CSV file.
   Calculations like PCA-Analysis or coordinte transformations are written as new columns into the csv file.
-  If a calculation of the momentum matrix elements was performed, the information from the QE `<prefix>_p_avg.dat` file is also read and relevant information is saved.
+  If a calculation of the momentum matrix elements was performed, the information from the QE `<prefix>_p_avg.dat` file is also read and relevant information is saved as `df_mme.csv`
+* After the momentum matrix elements are saved as `df_mme.csv`, the momentum matrix elements are added to the energy data frame as new columns.
+* The parameter `merge_decimals` specifies the number of decimal places used to map the coordinates of the MME calculation to the coordinates of the energy calculation.
 
 ## Loading the csv file (load_csv=True)
 * With `load_csv=True`, the previously calculated csv file can now be loaded.

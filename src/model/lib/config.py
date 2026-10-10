@@ -4,10 +4,17 @@ import shutil
 
 # ##################################################################
 
-prefix = "B2_model"
+# For the Tutorial/Example:
+"""prefix = "B2_model"
 main_directory = "/home/chris/VS_code/Masterarbeit-NiTi-Code/examples/B2_uspp"
 num_cores = 6
-num_pool = 3
+num_pool = 3"""
+
+# Research:
+prefix = "nitiB2_modelMME"
+main_directory = "/home/chris/nitiB2_uspp"
+num_cores = 4
+num_pool = 2
 
 ####################################################################
 

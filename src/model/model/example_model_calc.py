@@ -16,7 +16,7 @@ a = a / np.linalg.norm(a)
 v = (0, 0, 0)
 r = 0.2
 phi_steps = 48
-bandnumbers = (14, 15)
+bandnumbers = (14, 15) # Attention: Counting starts at 0
 zero = (0.34547436, 0.11871832, 0.11871832) # Punkt 1
 
 # from path_calculations (path)
@@ -31,7 +31,7 @@ modeltype_path="path_point1"
 
 plot_grid = False
 calc_dft = False
-calc_mme = False
+calc_mme = False; merge_decimals=10
 analysis = False
 load_csv = False
 calc_model = False
@@ -74,7 +74,8 @@ cut_value_diff=0.0124; cut_value_bands=0.05; complete_cut=True
 
 # calculation of the statistical values ​​of the matrix momentum elements
 mme_statistics=False
-merge_decimals=5
+merge_decimals=10
+df_key = "px_abs2_14-15"
 
 # calculating the intersection point
 find_intersection=False

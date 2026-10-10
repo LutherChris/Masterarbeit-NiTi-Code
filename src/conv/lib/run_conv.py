@@ -6,61 +6,7 @@ import lib.qe_conv as qe
 import lib.config as config
 from lib.plot_config import FIGWIDTH, HFACTOR, DATEIENNAME, SHOW, SAVE, TITEL, PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. nitiB2_conv_uspp.py und aktiviert verschiedene Abschnitte:
-- Konvergenz bzgl. "celldm"
-- Konvergenz bzgl. "ecutwfc"
-- Konvergenz bzgl. "K_POINTS automatic"
-- Konvergenz bzgl. smearing
-- Plotten
-
-# ===================================================================================
-# Übersicht aller Parameter
-# ===================================================================================
-
-cfg.diff_value              (float) Parameter des Konvergenzkriteriums in meV
-    Konvergenzkriterium :
-        max( |E_n-2 - E_n-1| , |E_n   - E_n-1| ) < cfg.diff_value 
-        max( |E_n-1 - E_n  | , |E_n+1 - E_n  | ) < cfg.diff_value 
-        max( |E_n   - E_n+1| , |E_n+2 - E_n+1| ) < cfg.diff_value 
-    - Diese Formel gilt für den Fall dass die Parameter eine Schrittweite von genau 1 haben.
-    - Die Schrittweite wird im Code berücksichtigt, indem durch |n_2 - n_1| usw... geteilt wird.
-
-# -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "ecutwfc"
-# -----------------------------------------------------------------------------------
-cfg.ecutwfc:                (bool) Aktiviert die Konvergenz bzgl. "ecutwfc"
-cfg.cutoff_list:            (list) Liste verschiedener ecutwfc-Werte
-
-# -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "nk" in K_POINTS automatic"
-# -----------------------------------------------------------------------------------
-cfg.k_points:               (bool) Aktiviert die Konvergenz bzgl. "K_POINTS automatic"
-cfg.nk_list_K_POINTS:       (list) Liste verschiedener nk-Werte
-
-# -----------------------------------------------------------------------------------
-# Konvergenz bzgl. "celldm"
-# -----------------------------------------------------------------------------------
-cfg.celldm:                 (bool) Aktiviert die Konvergenz bzgl. "celldm"
-cfg.celldm_list:            (list) Liste verschiedener celldm-Werte
-
-# -----------------------------------------------------------------------------------
-# Konvergenz bzgl. smearing
-# -----------------------------------------------------------------------------------
-cfg.smearing:               (bool) Aktiviert die Konvergenz bzgl. smearing
-cfg.key_smearing:           (str) Smearing-Typ
-                                möglich: "gauss", "marzari-vanderbilt", "methfessel-paxton"
-cfg.degauss_list:           (list) Liste verschiedener degauss-Werte
-cfg.nk_list_smearing:       (list) Liste verschiedener nk-Werte
-
-# -----------------------------------------------------------------------------------
-# Plots
-# -----------------------------------------------------------------------------------
-cfg.plot:                   (bool) Aktiviert Plots
-cfg.key_plot:               (str) Welche Konvergenz-Kurve soll geplottet werden?
-                               möglich: "celldm", "ecutwfc", "k_points", "smearing"
-cfg.nk_list_smearing_plot:  (list) Falls key_plot="smearing", welche nk-Werte sollen geplottet werden?
-"""
+# --------------------------------------------------------------------------------------
 
 def run(cfg):
     # Laden der Plot-Einstellungen aus plot_config.py

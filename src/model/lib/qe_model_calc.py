@@ -1325,6 +1325,15 @@ def calc_mme(p_str: str,
     path_nscf_in = config.path_nscf_in()
     path_nscf_in_out_directory = config.path_nscf_in_out_directory(datlabel, p_str, n_str)
 
+    # Überprüfe, ob der QE Patch dft2pk verwendet wird
+    with open(path_bands_x_in, "r") as txt_file:
+        for line in txt_file:
+            lines = line.strip()
+            # Leerzeichen und Punkte entfernen
+            lines = lines.lower().replace(" ", "").replace(".", "")
+            if "lallp=true" in lines:
+                print(f"----> dft2pk Parameter lallp=true in Eingabedatei {path_bands_x_in} gefunden.")
+
     # log Funktion und Start des Log zum Speichern der Rechenzeiten
     start_time = None
     log_file = None
@@ -1610,24 +1619,41 @@ def model_xml_to_df(k0: list,
 
 def mme_to_df(p_str: str,
               n_str: str,
-              datlabel: str):
+              datlabel: str,
+              bandnumbers: list = None):
     """
-    - Funktion liest bestimmte Betragsquadrate der Impuls-Matrix Elemente(PME) aus der filp-Datei von bands.x aus und gibt sie zusammen mit den k-Koordinaten als Pandas-Dataframe zurück
+    Mit dft2pk Patch:
+    - Funktion liest ALLE Real- und Imaginärteile der Impuls-Matrix Elemente(MME) aus der filp-Datei aus. 
+
+    Ohne dft2pk:
+    - Ausgabe der Betragsquadrate der Impuls-Matrix-Elemente, die QE ohne Patch liefert. 
     - die Betragsquadrate der Impuls-Matrix-Elemente sind:
         - |<n|p|m>|**2, wobei n=vorletztes Band, m=letztes Band
         - d.h. nur die k-Punkte werden berücksichtigt, bei denen En unterhalb der Fermi-Energie und Em oberhalb der Fermi-Energie liegt
-    - die Vorraussetzung dieser Funktion ist also, dass die interessanten Bänder nahe der Fermi-Energie die beiden höchsten Bänder in den Daten von QE sind
     
     Args: 
         p_str:          halbe Kantenlängen (p1, p2, p2) des Gitters als string (für Dateienpfad)
         n_str:          Anzahl der Datenpunkte (n1, n2, n3) als string (für Dateienpfad)
         datlabel:       Label in Dateienname
+        bandnumbers:    Legt fest, zwischen welchen Bändern die MME extrahiert werden.
     Return:
         df:     Pandas Dataframe (siehe oben)
     """
     # Laden der Ordner-Struktur
     path_p_avg = config.path_p_avg_copy(datlabel, p_str, n_str) # main_directory/prefix_out/suffix/prefix_p_avg.dat
     path_bands_x_in_copy = config.path_bands_x_in_copy(datlabel, p_str, n_str) # main_directory/prefix_out/suffix/prefix.bands_x.in
+    path_nscf_xml_copy = config.path_nscf_xml_copy(datlabel, p_str, n_str)
+
+    print(f"----> Ausgewählte Bänder: {bandnumbers} (Zählung beginnt bei 0)")
+    # Suchen des <nk> innerhalb der xml-Datei
+    tree = ET.parse(path_nscf_xml_copy)
+    root = tree.getroot()
+    nk_element = root.find('.//k_points_IBZ/nk')
+    if nk_element is not None:
+        nk = int(nk_element.text)
+        print(f"----> Anzahl der k-Punkte: {nk}")
+    else:
+        print("----> Das Element <nk> wurde nicht gefunden.")
 
     # Überprüfe, ob der QE Patch dft2pk verwendet wird
     dft2pk = False
@@ -1658,10 +1684,16 @@ def mme_to_df(p_str: str,
                     continue
             data.append(numbers)
 
+    try:
+        nks = int(data[0][1])
+        print(f"----> Anzahl der k-Punkte wurde der p_avg.dat entnommen.")
+    except:
+        nks = nk
+        print(f"----> Anzahl der k-Punkte wurde der nscf-XML Datei entnommen.")
+
     if dft2pk:
         # Daten 
         nbnd = int(data[0][0])
-        nks = int(data[0][1])
         print(f"----> Anzahl der Bänder: {nbnd}")
         print(f"----> Anzahl der k-Punkte: {nks}")
 
@@ -1682,51 +1714,70 @@ def mme_to_df(p_str: str,
         nbnd_occ = []  # Anzahl der besetzten Bänder
         re_k = []      # Realteile aller k-Punkte
         im_k = []
+        abs2_k = []
         for k in range(nks):
             k_points.append(data[line0][0:3])  # k-Punkte
             nbnd_occ.append(data[line0][3])    # Anzahl der besetzten Bänder
 
             re_p = [] # Realteil aller p-Richtungen 
             im_p = []
+            abs2_p = []
             for linep in (line1, line2, line3):
                 lineb = linep+1     # Erste Zeile eines p-Plocks
                 re_b = []           # Realteile aller Bänder
                 im_b = []
+                abs2_b = []
                 for b in range(nbnd):
                     b_line = lineb+b*block  # Erste Zeile eines Blocks
                     re_b_b= []      # Realteile eines Bandes zum Nächsten
                     im_b_b = []     # Imaginärteile eines Bandes
+                    abs2_b_b = []
                     for b_b in range(block):
                         b_b_line = b_line+b_b
-                        re_b_b.extend(data[b_b_line][::2])   
-                        im_b_b.extend(data[b_b_line][1::2])
+                        re_terms = data[b_b_line][::2]
+                        im_terms = data[b_b_line][1::2]
+                        abs2_terms = [r**2 + i**2 for r, i in zip(re_terms, im_terms)]
+                        re_b_b.extend(re_terms)   
+                        im_b_b.extend(im_terms)
+                        abs2_b_b.extend(abs2_terms)
                     re_b.append(re_b_b)
                     im_b.append(im_b_b)
+                    abs2_b.append(abs2_b_b)
                 re_p.append(re_b)
                 im_p.append(im_b)
+                abs2_p.append(abs2_b)
             re_k.append(re_p)
             im_k.append(im_p)
+            abs2_k.append(abs2_p)
             line0 = line3+nbnd*block+1
             line1 = line0+1
             line2 = line1+nbnd*block+1
             line3 = line2+nbnd*block+1
 
+        # Bänder auswählen
+        if bandnumbers is not None:
+            selected_bands = list(bandnumbers)
+        else:
+            selected_bands = range(nbnd)
+
         # Pandas Dataframe erstellen
         keys = ['kx', 'ky', 'kz', 'nbnd_occ']
         for p in ['px', 'py', 'pz']:
-            for i in range(nbnd):
-                for j in range(nbnd):
-                    keys.append(f"{p}_re_{i+1}-{j+1}")
-                    keys.append(f"{p}_im_{i+1}-{j+1}")
+            for i in selected_bands:
+                for j in selected_bands:
+                    keys.append(f"{p}_re_{i}-{j}")
+                    keys.append(f"{p}_im_{i}-{j}")
+                    keys.append(f"{p}_abs2_{i}-{j}")
 
         df_rows = []
         for k in range(nks):
             row = [k_points[k][0], k_points[k][1], k_points[k][2], int(nbnd_occ[k])]
             for p in range(3):
-                for i in range(nbnd):
-                    for j in range(nbnd):
+                for i in selected_bands:
+                    for j in selected_bands:
                         row.append(re_k[k][p][i][j])
-                        row.append(im_k[k][p][i][j])           
+                        row.append(im_k[k][p][i][j]) 
+                        row.append(abs2_k[k][p][i][j])          
             df_rows.append(row)
 
         # 3. Pandas DataFrame erzeugen
@@ -1783,13 +1834,22 @@ def mme_to_df(p_str: str,
             line0 = line3+nbnd_free*block+1
 
         nbnd_free_max = max(nbnd_free_list)
+
+        # Bänder auswählen
+        if bandnumbers is not None:
+            selected_bands = list(bandnumbers)
+        else:
+            selected_bands = range(nbnd)
+
+        i_range = [i for i in range(nbnd - nbnd_free_max, nbnd) if i in selected_bands]
+        j_range = [j for j in range(nbnd - nbnd_free_max) if j in selected_bands]
    
         # Pandas Dataframe erstellen
         keys = ["kx", "ky", "kz", "nbnd_occ"]
         for p in ["px", "py", "pz"]:
-            for i in range(nbnd - nbnd_free_max, nbnd):
-                for j in range(nbnd - nbnd_free_max):
-                    keys.append(f"{p}_{j+1}-{i+1}")
+            for i in i_range:
+                for j in j_range:
+                    keys.append(f"{p}_{j}-{i}")
         print(keys)
 
         df_rows = []
@@ -1798,8 +1858,8 @@ def mme_to_df(p_str: str,
             current_nbnd_occ = nbnd_occ_list[k]
             
             for p in range(3):
-                for i in range(nbnd - nbnd_free_max, nbnd):
-                    for j in range(nbnd - nbnd_free_max):
+                for i in i_range:
+                    for j in j_range:
                         relative_i = int(i - current_nbnd_occ)
                         if relative_i >= 0:
                             row.append(avg_k[k][p][relative_i][j])
@@ -1809,15 +1869,55 @@ def mme_to_df(p_str: str,
         df = pd.DataFrame(df_rows, columns=keys)
         print(df)
         print(f"----> DataFrame erfolgreich erstellt! Shape: {df.shape}")
-        
-    return df
     
+    return df
+
+def merge_df_dfmme(df: list,
+                   df_mme: list,
+                   merge_decimals: int=10):
+    """ 
+    - Funktion entfernt Duplikate
+    - dann werden die k-Punkte beider Dataframes zugeordnet und die MME dem Dataframe der Energie hinzugefügt
+    Args: 
+        df:                 Dataframe der Energie
+        df_mme:             Dataframe der Matrix-Elemente
+        merge_decimals:     Anzahl der Nachkommastellen, auf denen die Dataframes miteinander verglichen werden
+    Return:
+        df:                 Dataframe der Energie ergänzt durch die Spalten der Matrixelemente
+    """
+    print("---->  Vergleich beider Dataframes df, df_mme")
+    decimals = merge_decimals
+    cols = ['kx', 'ky', 'kz']
+    df1 = df.copy()
+    df2 = df_mme.copy()
+    new_keys = []
+    for col in cols:
+        new_keys.append(f"{col}_tmp")
+        df1[f"{col}_tmp"] = df1[col].round(decimals)
+        df2[f"{col}_tmp"] = df2[col].round(decimals)
+    # Doppelte Zeilen entfernen:
+    df1_clean = df1.drop_duplicates(subset=new_keys)
+    df2_clean = df2.drop_duplicates(subset=new_keys)
+    print(f"---->  Anzahl der Duplikate (mehrfach vorkommende k-Punkte): {len(df1)-len(df1_clean)}")
+
+    df2_clean = df2_clean.drop(columns=cols) # Spalten aus df2_clean entfernen, um Suffix-Problem (_x, _y) beim Merge zu verhindern
+    df_merged = pd.merge(df1_clean, df2_clean, on=new_keys)
+    df_merged = df_merged.drop(columns=new_keys)
+    if (len(df1_clean) == len(df_merged)) and (len(df2_clean) == len(df_merged)):
+        print(f"---->  Vergleich erfolgreich! Anzahl der k-Punkte ohne Duplikate: {len(df1_clean)}")
+        print("---->  MME dem Dataframe der Energie hinzugefügt.")
+        return df_merged
+    else:
+        print("WARNUNG: k-Punkte zwischen den Dataframes konnten nicht zugeordnet werden. Eventuell Parameter merge_decimals anpassen.")
+        return df
+
 # --------------------------------------------------------------------------------------
 # Berechnung statistischer Größen für die Matrix-Impuls-Elemente
 # --------------------------------------------------------------------------------------
 
 def mme_statistics(df: list,
                    df_mme: list,
+                   df_key: str,
                    merge_decimals: int=None):
     """
     - Funktion berechnet statische Werte der Matrix-Impuls-Elemente von QE
@@ -1830,141 +1930,74 @@ def mme_statistics(df: list,
     Args:
         df:                 pandas Dataframe der Energie-Berechnung
         df_mme:             pandas Dataframe der Matrix-Impuls-Elemente
+        df_key:             key des pandas Dataframes, z.B: "px_abs2_14-15"
         merge_decimals:     Anzahl der Nachkommastellen, auf denen die Dataframes miteinander verglichen werden
     """
-    px = df_mme["px"]
-    py = df_mme["py"]
-    pz = df_mme["pz"]
+    p_key = df_mme[df_key]
 
     # Standardabweichung
-    px_std = np.std(px)
-    py_std = np.std(py)
-    pz_std = np.std(pz)
-
-    print(f"----> Standardabweichung (px,py,pz)")
-    print(px_std)
-    print(py_std)
-    print(pz_std)
-    print()
+    p_std = np.std(p_key)
+    print(f"----> Standardabweichung        {df_key}:   {p_std}")
 
     # Erwartungswert
-    px_mean = np.mean(px)
-    py_mean = np.mean(py)
-    pz_mean = np.mean(pz)
-
-    print("----> Erwartungswert (px,py,pz)")
-    print(px_mean)
-    print(py_mean)
-    print(pz_mean)
-    print()
+    p_mean = np.mean(p_key)
+    print(f"----> Erwartungswert            {df_key}:   {p_mean}")
 
     # Variationskoeffizient
-    px_var = px_std/px_mean
-    py_var = py_std/py_mean
-    pz_var = pz_std/pz_mean
-
-    print("----> Variationskoeffizient (px,py,pz)")
-    print(px_var)
-    print(py_var)
-    print(pz_var)
-    print()
+    p_var = p_std/p_mean
+    print(f"----> Variationskoeffizient     {df_key}:   {p_var}")
 
     # Spannweite
-    px_spann = np.max(px)-np.min(px)
-    py_spann = np.max(py)-np.min(py)
-    pz_spann = np.max(pz)-np.min(pz)
-
-    print("----> Spannweite (px,py,pz)")
-    print(px_spann)
-    print(py_spann)
-    print(pz_spann)
-    print()
+    p_spann = np.max(p_key)-np.min(p_key)
+    print(f"----> Spannweite                {df_key}:   {p_spann}")
 
     # relativer maximaler Fehler
-    px_rel = np.max([ np.abs(np.max(px)-px_mean) , np.abs(np.min(px)-px_mean) ]) / px_mean
-    py_rel = np.max([ np.abs(np.max(py)-py_mean) , np.abs(np.min(py)-py_mean) ]) / py_mean
-    pz_rel = np.max([ np.abs(np.max(pz)-pz_mean) , np.abs(np.min(pz)-pz_mean) ]) / pz_mean
+    p_rel = np.max([ np.abs(np.max(p_key)-p_mean) , np.abs(np.min(p_key)-p_mean) ]) / p_mean
+    print(f"----> relativer Maximalfehler   {df_key}:    {p_rel}\n")
 
-    print("----> relativer Maximalfehler (px,py,pz)")
-    print(px_rel)
-    print(py_rel)
-    print(pz_rel)
-    print()
-
+    # Vergleich beider Dataframes (z.B: für Statistik im THz-Bereich)
     if merge_decimals is not None:
-        print("")
-        print("---->  Zusammenfügen beider Dataframes df, df_mme")
+        print("---->  Vergleich beider Dataframes df, df_mme")
         decimals = merge_decimals
         cols = ["kx", "ky", "kz"]
         df1 = df.copy()
         df2 = df_mme.copy()
 
+        new_keys = []
         for col in cols:
+            new_keys.append(f"{col}_tmp")
             df1[f"{col}_tmp"] = df1[col].round(decimals)
             df2[f"{col}_tmp"] = df2[col].round(decimals)
-        
-        df_merged = pd.merge(df1, df2, on=["kx_tmp", "ky_tmp", "kz_tmp"])
-        df_merged = df_merged.drop(columns=["kx_tmp", "ky_tmp", "kz_tmp"])
-        print(f"---->  Zusammenfügen erfolgreich für {len(df_merged)} von {len(df_mme)} Zeilen.")
 
-        px = df_merged["px"]
-        py = df_merged["py"]
-        pz = df_merged["pz"]
+        # Doppelte Zeilen entfernen:
+        df1_clean = df1.drop_duplicates(subset=new_keys)
+        df2_clean = df2.drop_duplicates(subset=new_keys)
+
+        df_merged = pd.merge(df1_clean, df2_clean, on=new_keys)
+        df_merged = df_merged.drop(columns=new_keys)
+        print(f"---->  Vergleich erfolgreich. Länge der Zeilen ohne Duplikate:\n       df: {len(df1_clean)} Zeilen\n       df_mme: {len(df2_clean)} Zeilen\n       df_merged: {len(df_merged)} Zeilen.")
+
+        p_key = df_merged[df_key]
 
         # Standardabweichung
-        px_std = np.std(px)
-        py_std = np.std(py)
-        pz_std = np.std(pz)
-
-        print(f"----> Standardabweichung (px,py,pz)")
-        print(px_std)
-        print(py_std)
-        print(pz_std)
-        print()
+        p_std = np.std(p_key)
+        print(f"----> Standardabweichung        {df_key}:   {p_std}")
 
         # Erwartungswert
-        px_mean = np.mean(px)
-        py_mean = np.mean(py)
-        pz_mean = np.mean(pz)
-
-        print("----> Erwartungswert (px,py,pz)")
-        print(px_mean)
-        print(py_mean)
-        print(pz_mean)
-        print()
+        p_mean = np.mean(p_key)
+        print(f"----> Erwartungswert            {df_key}:   {p_mean}")
 
         # Variationskoeffizient
-        px_var = px_std/px_mean
-        py_var = py_std/py_mean
-        pz_var = pz_std/pz_mean
-
-        print("----> Variationskoeffizient (px,py,pz)")
-        print(px_var)
-        print(py_var)
-        print(pz_var)
-        print()
+        p_var = p_std/p_mean
+        print(f"----> Variationskoeffizient     {df_key}:   {p_var}")
 
         # Spannweite
-        px_spann = np.max(px)-np.min(px)
-        py_spann = np.max(py)-np.min(py)
-        pz_spann = np.max(pz)-np.min(pz)
+        p_spann = np.max(p_key)-np.min(p_key)
+        print(f"----> Spannweite                {df_key}:   {p_spann}")
 
-        print("----> Spannweite (px,py,pz)")
-        print(px_spann)
-        print(py_spann)
-        print(pz_spann)
-        print()
-
-        # Maximaler relativer Fehler
-        px_rel = np.max([ np.abs(np.max(px)-px_mean) , np.abs(np.min(px)-px_mean) ]) / px_mean
-        py_rel = np.max([ np.abs(np.max(py)-py_mean) , np.abs(np.min(py)-py_mean) ]) / py_mean
-        pz_rel = np.max([ np.abs(np.max(pz)-pz_mean) , np.abs(np.min(pz)-pz_mean) ]) / pz_mean
-
-        print("----> Maximaler relativer Fehler (px,py,pz)")
-        print(px_rel)
-        print(py_rel)
-        print(pz_rel)   
-        print()
+        # relativer maximaler Fehler
+        p_rel = np.max([ np.abs(np.max(p_key)-p_mean) , np.abs(np.min(p_key)-p_mean) ]) / p_mean
+        print(f"----> relativer Maximalfehler   {df_key}:    {p_rel}\n")
 
 # --------------------------------------------------------------------------------------
 # Berechnung des Schnittpunktes
@@ -2618,7 +2651,7 @@ def model_save_csv(df: list,
     prefix = config.prefix
     path_result_directory = config.path_result_directory(modeltype, datlabel, p_str, n_str)
     path_csv = os.path.join(path_result_directory, f"{prefix}_{csv_suffix}.csv")
-    print(f"Speichere Dataframe der Modell-Energien an folgendem Ort:\n{path_csv}")
+    print(f"Speichere Dataframe an folgendem Ort:\n{path_csv}")
     df.to_csv(path_csv, index=index)
 
 def model_load_df(p_str: str,

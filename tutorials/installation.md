@@ -124,3 +124,55 @@ strg+shift+P -> Python: Select Interpreter -> conda-Umgebung (myenv)
 ```
 a.SetVisibility(visible) -> a.SetVisibility(int(visible))
 ```
+
+## Installing the dft2kp patch (https://gitlab.com/dft2kp/dft2kp):
+
+* Download the patch for your QE version:
+  https://gitlab.com/dft2kp/dft2kp/-/tree/main/patch
+* Copy the patch from dft2kp to the QE folder:
+  `q-e-qe-7.6/patch/qe2kp-7.6.patch`
+* Open the terminal in the QE folder
+* Create a virtual Python environment in the QE folder:
+```
+python3 -m venv venv
+```
+* Start the Python environment
+```
+source venv/bin/activate
+```
+* Install dft2kp with pip
+```
+pip install git+https://gitlab.com/dft2kp/dft2kp.git
+```
+* Then, in the Python environment within the QE folder, execute the following commands:
+```
+git init
+git add
+git commit -m "Initial QE commit
+git apply patch/qe2kp-7.6.patch
+```
+* Restart the Terminal
+* Recompile QE, where 12 is the number of cores
+```
+make pwall -j12
+```
+
+## Changes after the dft2ko patch:
+* The QE XML files uses scientific notation (e.g., 3.383630720470000E-001).
+  With this change, the k-Points for the momentum matrix elements (`p_avg.dat`) is specified in the same format and with maximum precision.
+  This allows the MME to be assigned to the calculated energies.
+
+* Open the QE file:
+  `/home/chris/q-e-qe-7.6/PP/src/write_p_avg.f90`
+* Change line 160 to:
+```
+        WRITE (iunout, '(10x,3es25.16,i7)') xk(1,ik),xk(2,ik),xk(3,ik), &
+```
+* The old line was:
+```
+        WRITE (iunout, '(10x,3f10.8,i7)') xk(1,ik),xk(2,ik),xk(3,ik), &
+```
+* Recompile QE, where 12 is the number of cores
+```
+make pwall -j12
+```

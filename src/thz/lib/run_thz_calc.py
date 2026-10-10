@@ -5,59 +5,8 @@ import matplotlib.pyplot as plt
 import lib.qe_thz_calc as thz
 from lib.plot_config import PLOT_SETTINGS
 
-"""
-Diese Datei lädt cfg.-Parameter aus z.B. nitiB2_thz_calc_uspp_punkt1.py und aktiviert verschiedene Abschnitte:
-- Definition der Pfade
-- Plot der Pfade
-- Berechnung der Pfade
-- Laden und Analyse der Daten
+# --------------------------------------------------------------------------------------
 
-- Es werden mit pw.x bands-Rechnungen entlang verschiedener Pfade berechnet. 
-- Die Pfade sind othogonal zu einem Einheitsvektor u.
-- Der Anfangsvektor ist: R*u + v + r*a
-- v = Verschiebungsvektor
-- a = Einheitsvektor für Anfangspfad
-- weitere Pfade werden durch Drehung des Anfangsvektors ind er Ebene orthogonal zu u definiert
-- a und u müssten orthogonal sein
-
-# ===================================================================================
-# Übersicht aller Parameter
-# ===================================================================================
-# -----------------------------------------------------------------------------------
-# Definition der Pfade
-# -----------------------------------------------------------------------------------
-cfg.nks_list    (list) Liste verschiedener nks-Werte
-                        nks: (int) Anzahl der Datenpunkte pro Pfad
-cfg.R_list      (list) Liste verschiedener R-Werte
-                        R: (float) Radius für den Einheitsvektor u 
-cfg.u           (list) (ux,uy,uz) - Einheitsvektor der Ursprungsgerade, um die gedreht wird
-cfg.a           (list) (ax, ay, az) - Einheitsvektor für Anfangspfad, der orthogonal zu u liegt
-cfg.r           (float) Radius für den Einheitsvektor a
-cfg.v           (list) (vx, vy, vz) - Verschiebevektor für den Anfangspfad
-cfg.phi_steps   (int) Anzahl der Zwischenpfade zwischen 0° und 180°
-cfg.minangle    (float) in deg, minimaler Winkel der Berechnungen (für den Plot)
-cfg.maxangle    (flaot) in deg, maximaler Winkel der Berechnungen (für den Plot)
-cfg.decimals    (int) legt fest, auf wie viele Nachkommastellen die Pfadvektoren gerundet werden, standart:12
-
-# -----------------------------------------------------------------------------------
-# Plot der Pfade
-# -----------------------------------------------------------------------------------
-cfg.plot_coords (bool) Aktiviert den Plot der Pfade
-
-# -----------------------------------------------------------------------------------
-# Berechnung der Pfade
-# -----------------------------------------------------------------------------------
-cfg.calc        (bool) Aktiviert die Berechung der Pfade durch QE
-cfg.datlabel    (str) extra Label in Dateienname, um Rechnungen zu unterscheiden
-
-# -----------------------------------------------------------------------------------
-# Laden und Analyse der Daten
-# -----------------------------------------------------------------------------------
-cfg.analysis    (bool) Aktiviert das Laden und die Analyse der Daten
-cfg.bandnumbers (list) Liste der Bänder, die für den Plot ausgewählt werden.
-                    Werden genau zwei Bänder gewählt, wird die Differenz berechnet.
-                    Achtung: Zählung beginnt bei 0.
-"""
 def run_single(coords, R, r, phi_steps, nks, datlabel):
     thz.thz_calc(coords, R, r, phi_steps, nks, datlabel)
 
