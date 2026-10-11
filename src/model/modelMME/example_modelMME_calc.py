@@ -32,7 +32,7 @@ modeltype_path="path_point1"
 
 plot_grid = False
 calc_dft = False
-calc_mme = False
+calc_mme = False; merge_decimals=10
 analysis = False
 load_csv = False
 calc_model = False
@@ -41,7 +41,7 @@ calc_model = False
 # basic parameters for 5th and 7th block.
 # --------------------------------------------------------------------------------------
 # Energy on which the calculations are performed
-energy="px"
+energy="px_abs2_14-15"
 
 # Coordinate axes used for analysis and modeling   
 coord_system="path" 
@@ -75,7 +75,8 @@ cut_value_diff=0.0124; cut_value_bands=0.05; complete_cut=True
 
 # calculation of the statistical values ​​of the matrix momentum elements
 mme_statistics=True
-merge_decimals=5
+merge_decimals=10
+df_key = "px_abs2_14-15"
 
 # calculating the intersection point
 find_intersection=False
@@ -85,7 +86,7 @@ intersect_point="point_1"
 # parameters for model calculation
 # --------------------------------------------------------------------------------------
 # Should omit the 0th order of the polynomial?
-no_a0 = True
+no_a0 = False
 
 # maximum number of coefficients
 max_coeffs = 3000

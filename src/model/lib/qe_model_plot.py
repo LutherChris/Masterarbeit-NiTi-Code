@@ -218,8 +218,8 @@ def model_2Dplots_xyz(axis: str,
         fig.canvas.draw_idle()
 
     # Slider-Achsen erstellen
-    ax_slider_1 = plt.axes([0.15, 0.12, 0.4, 0.03])
-    ax_slider_2 = plt.axes([0.15, 0.04, 0.4, 0.03])
+    ax_slider_1 = plt.axes([0.2, 0.15, 0.4, 0.03])
+    ax_slider_2 = plt.axes([0.2, 0.08, 0.4, 0.03])
     # Text neben Slider
     txt_slider_1 = ax_slider_1.text(1.2, 0.5, "", transform=ax_slider_1.transAxes, va="center")
     txt_slider_2 = ax_slider_2.text(1.2, 0.5, "", transform=ax_slider_2.transAxes, va="center")
@@ -675,11 +675,14 @@ def model_4Dplots(p: list,
     ax.axis("equal")
 
     # Colorbar allgemein
-    #cbar = fig.colorbar(im)
-    cbar_ax = fig.add_axes([0.78, 0.14, 0.03, 0.7])
+    cbar_ax = fig.add_axes([0.80, 0.15, 0.03, 0.6])
     cbar = fig.colorbar(im, cax=cbar_ax)
-    #cbar.set_label(f"$\\Delta E$ [eV]", labelpad=2)
+    cbar.formatter.set_scientific(True)
+    cbar.formatter.set_powerlimits((0, 0))
+    #cbar.set_label(r"$\Delta E_\text{QE}$ [eV]", labelpad=2)
     cbar_ax.tick_params(axis='y', pad=2)
+    #ax.view_init(elev=20, azim=-30)
+    ax.view_init(elev=30, azim=-30)
 
     if TITEL:
         plt.title(f"{title}")   

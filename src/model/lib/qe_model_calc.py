@@ -1833,36 +1833,32 @@ def mme_to_df(p_str: str,
             avg_k.append(avg_p)
             line0 = line3+nbnd_free*block+1
 
-        nbnd_free_max = max(nbnd_free_list)
-
         # Bänder auswählen
         if bandnumbers is not None:
             selected_bands = list(bandnumbers)
         else:
             selected_bands = range(nbnd)
-
-        i_range = [i for i in range(nbnd - nbnd_free_max, nbnd) if i in selected_bands]
-        j_range = [j for j in range(nbnd - nbnd_free_max) if j in selected_bands]
-   
+    
         # Pandas Dataframe erstellen
         keys = ["kx", "ky", "kz", "nbnd_occ"]
         for p in ["px", "py", "pz"]:
-            for i in i_range:
-                for j in j_range:
-                    keys.append(f"{p}_{j}-{i}")
+            for i in selected_bands[1:]:
+                for j in selected_bands[:-1]:
+                    if j<i:
+                        keys.append(f"{p}_{j}-{i}")
         print(keys)
 
         df_rows = []
         for k in range(nks):
             row = [k_points[k][0], k_points[k][1], k_points[k][2], int(nbnd_occ_list[k])]
-            current_nbnd_occ = nbnd_occ_list[k]
-            
+            nbnd_occ = nbnd_occ_list[k]-1          
             for p in range(3):
-                for i in i_range:
-                    for j in j_range:
-                        relative_i = int(i - current_nbnd_occ)
-                        if relative_i >= 0:
-                            row.append(avg_k[k][p][relative_i][j])
+                for n, i in enumerate(selected_bands[1:]):
+                    for j in selected_bands[:-1]:
+                        if (nbnd_occ in selected_bands) and (nbnd_occ != nbnd-1) and j<i:
+                                print(nbnd_occ, (n,j,i))
+                                print(avg_k[k][p][n])
+                                row.append(avg_k[k][p][n][j])
                         else:
                             row.append(None)
             df_rows.append(row)

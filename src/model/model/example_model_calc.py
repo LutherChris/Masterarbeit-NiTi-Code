@@ -66,7 +66,7 @@ path_phi_sym=1; path_no_rho0=False; path_rho_dense=0; path_rho_sigma=0.006; path
 pca=False
 
 # removal of zero values ​​from the data
-no_000=True
+no_000=False
 
 # filtering the data frame to the THz-active area
 cut_df_for_fit=False
