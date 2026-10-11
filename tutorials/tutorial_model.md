@@ -46,11 +46,11 @@ num_pool = 3
 With this type of file, the following sections can be configured:
 * Definition of a grid in the Brillouin zone
 * Plotting of this grid
-* Calculation of band energies via Quantum Espresso on this grid
-* Calculation of momentum matrix elements (MME) via Quantum Espresso on this grid
-* Reading the QE XML file, analyzing it, and saving it as CSV files
+* Calculation of band energies via Quantum Espresso
+* Calculation of momentum matrix elements (MME) via Quantum Espresso
+* Reading the QE XML file, p_avg.dat file, analyzing, and saving it as CSV files
 * Loading the CSV file
-* Modeling the band energies and the bands
+* Modeling the band energies or momentum matrix elements
 
 ## Definition of fixed parameters
 
@@ -75,12 +75,12 @@ modeltype_path="path_point1"
 ```
 
 * First, some fixed parameters must be assigned. 
-  These include the parameters `u`, `a`, `v`, `r`, `phi_steps`, and `bandnumbers` from the (`thz`) module and a calculation of the intersection point (`sect`).
-* Important: The parameter `bandnumbers` contains exactly 2 entries to calculate the band difference.
+  These include the parameters `u`, `a`, `v`, `r`, `phi_steps`, and `bandnumbers` from the (`thz`) module
+* Important: The parameter `bandnumbers` should contains exactly 2 entries to calculate the band difference $\Delta E=|E_1 -E_0|$.
 * The coordinate center of the grid is defined via `zero`.
-  After calculating the intersection point near the Fermi energy, the coordinates are set accordingly.
+  After calculating the intersection point near the Fermi energy (example in folder `sect`), the coordinates are set accordingly.
 * The next parameters originate from the calculation of the crossing paths of the bands (`path`).
-  If the path calculation has not yet been performed, the following parameters can be omitted.
+  If the path calculation has not yet been performed, these parameters can be omitted.
   The parameter `coord_basis` defines which coordinate system was used in the path calculation.
   The model of the path is defined via `modeltype_path`, along with the coefficients defined by `a_coeffs` and `b_coeffs`.
 
@@ -103,10 +103,10 @@ calc_model = False                      # BLOCK 7
 | 1 | Definition of the grid (Permanently active) |
 | 2 | Plotting of the grid |
 | 3 | Calculation of band energies via Quantum Espresso |
-| 4 | Calculation of matrix elements via Quantum Espresso |
+| 4 | Calculation of momentum matrix elements via Quantum Espresso |
 | 5 | Calculation, analysis, and alignment of DataFrames |
 | 6 | Loading the DataFrames |
-| 7 | Modeling of the band energies |
+| 7 | Modeling of the band energies or momentum matrix elements|
 
 * Note: The MME calculation supports the unofficial Quantum Espresso patch `dft2kp`, which can be found at: https://gitlab.com/dft2kp/dft2kp.
 
@@ -117,16 +117,19 @@ energy="diff"
 coord_system="path"
 ```
 
-Next, the configuration is done via various parameters, starting with fundamental definitions for Blocks 5 and 7.
+Next, the configuration is done via various parameters, starting with fundamental definitions for blocks 5 and 7.
 
-* The parameter `energy` specifies which energies the analysis block and model block are based on. Examples are:
+* The parameter `energy` specifies which axis the analysis block and model block are based on.
+  In principle, any axis of the CSV file `<main_cirectory>/<prefix>_out/<suffix>/<modeltype>/<prefix>_df.csv`can be selected for the analysis and modelling. 
+  Examples are:
   * "diff": band difference
   * "band0": lower band
   * "band1": upper band
+  * "px_abs2_14-15": squared magnitudes of the momentum matrix elements between the band 14 and 15
 
 * The parameter `coord_system` determines whether a coordinate transformation takes place. The logic works as follows:
   * If the grid is **not** defined via path coordinates {$t, \rho, \phi$} and `coord_system="path"` is set, then the coordinate transformation {$x,y,z$} -> {$t,\rho,\phi$} is calculated numerically (if the coefficients are available).
-  * If `coord_system == "xyz_scaled"`, the coordinate system {$x,y,z$} is scaled to the interval [-1,1].
+  * If `coord_system="xyz_scaled"`, the coordinate system {$x,y,z$} is scaled to the interval [-1,1].
     This is only possible in regular grids. 
     The coord systems of the code are explained in `parameters/parameters_of_model/parameters_of_calc.md`
 

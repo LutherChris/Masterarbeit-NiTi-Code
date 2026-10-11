@@ -3,18 +3,18 @@ from matplotlib.transforms import Bbox
 """ Konfigurationsdatei für globale Plot-Settings"""
 
 # Plot im Fenster Anzeigen?
-SHOW = True
+SHOW = False
 # Plots speichern?
-SAVE = False
+SAVE = True
 # Name der Datei zum Speichern der Abbildung
-DATEIENNAME = "path_v2.0"
+DATEIENNAME = "punkt1_pz_abs2_14-15_thz"
 # Titel in manchen Plots aktivieren?
-TITEL = True
+TITEL = False
 
 # Größe der Figur plt.figure(figsize=(FIGWIDTH,FIGWIDTH*HFACTOR))
 TEXTWIDTH_CM = 15.5
 FIGWIDTH = 1 * TEXTWIDTH_CM / 2.54  # Umrechnung in Zoll für matplotlib
-HFACTOR = 0.6
+HFACTOR = 0.5
 
 # Einstellungen für SCATTER-Plots
 SCATTER_CONFIG = {"marker": ".",

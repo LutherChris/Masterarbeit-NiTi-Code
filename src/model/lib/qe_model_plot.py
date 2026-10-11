@@ -675,7 +675,11 @@ def model_4Dplots(p: list,
     ax.axis("equal")
 
     # Colorbar allgemein
-    cbar = fig.colorbar(im)
+    #cbar = fig.colorbar(im)
+    cbar_ax = fig.add_axes([0.78, 0.14, 0.03, 0.7])
+    cbar = fig.colorbar(im, cax=cbar_ax)
+    #cbar.set_label(f"$\\Delta E$ [eV]", labelpad=2)
+    cbar_ax.tick_params(axis='y', pad=2)
 
     if TITEL:
         plt.title(f"{title}")   

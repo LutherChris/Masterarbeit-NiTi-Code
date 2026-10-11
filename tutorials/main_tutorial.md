@@ -82,10 +82,10 @@ Masterarbeit-NiTi-Code/                   <main_cirectory>/
     |   ├── lib/                                |   ├── <prefix>.nscf.in
     |   |   ├── config.py                       |   ├── <prefix>.scf.out
     |   |   ├── plot_config.py                  |   └── ...
-    |   |   ├── qe_conv.py                      ├── <prefix_out>/
+    |   |   ├── qe_conv.py                      ├── <prefix>_out/
     |   |   └── run_conv.py                     |   ├── <suffix>/
     |   ├── example_conv.py                     |   |   ├── <nscf>/
-    |   └── ...                                 |   |   |   └── <prefix>.xml
+    |   └── ...                                 |   |   |   <main_cirectory>/└── <prefix>.xml
     ├── model/                                  |   |   ├── <scf>/
     |   ├── lib/                                |   |   |   └── <prefix>.xml
     |   |   ├── config.py                       |   |   ├── <modeltype>/
@@ -104,7 +104,7 @@ Masterarbeit-NiTi-Code/                   <main_cirectory>/
     |   |   └── ...                             |   |   ├── <prefix>.scf.out
     |   ├── modelMME/                           |   |   └── ...
     |   |   ├── example_modelMME_calc.py        |   └── ...
-    |   |   ├── example_modelMME_plot.py        ├── <prefix_out>/
+    |   |   ├── example_modelMME_plot.py        ├── <prefix>_tmp/
     |   |   └── ...                             |   ├── <suffix>/
     |   ├── path/                               |   |   ├── <prefix>.save/
     |   |   ├── example_path_00_calc.py         |   |   ├── <prefix>.xml
