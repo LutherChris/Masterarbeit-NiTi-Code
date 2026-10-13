@@ -1869,52 +1869,49 @@ def mme_to_df(p_str: str,
     return df
 
 def merge_df_dfmme(df: list,
-                   df_mme: list,
-                   merge_decimals: int=10):
+                   df_mme: list):
     """ 
-    - Funktion entfernt Duplikate
     - dann werden die k-Punkte beider Dataframes zugeordnet und die MME dem Dataframe der Energie hinzugefügt
     Args: 
         df:                 Dataframe der Energie
         df_mme:             Dataframe der Matrix-Elemente
-        merge_decimals:     Anzahl der Nachkommastellen, auf denen die Dataframes miteinander verglichen werden
     Return:
         df:                 Dataframe der Energie ergänzt durch die Spalten der Matrixelemente
     """
     print("---->  Vergleich beider Dataframes df, df_mme")
-    decimals = merge_decimals
-    cols = ['kx', 'ky', 'kz']
+    # Prüfung, ob beiden Dataframes gleich viele Zeilen haben
+    if len(df) != len(df_mme):
+        raise ValueError("Die Dataframes haben unterschiedlich viele k-Punkt!")
+    # Dataframes auf identischen Index überprüfen
+    if not df.index.equals(df_mme.index):
+        raise ValueError("Die Indizes der DataFrames stimmen nicht überein!")
+     
     df1 = df.copy()
-    df2 = df_mme.copy()
-    new_keys = []
-    for col in cols:
-        new_keys.append(f"{col}_tmp")
-        df1[f"{col}_tmp"] = df1[col].round(decimals)
-        df2[f"{col}_tmp"] = df2[col].round(decimals)
-    # Doppelte Zeilen entfernen:
-    df1_clean = df1.drop_duplicates(subset=new_keys)
-    df2_clean = df2.drop_duplicates(subset=new_keys)
-    print(f"---->  Anzahl der Duplikate (mehrfach vorkommende k-Punkte): {len(df1)-len(df1_clean)}")
+    df2 = df_mme.copy().rename(columns={"kx": "kx_mme", "ky": "ky_mme", "kz": "kz_mme"})
+    df_merged = pd.concat([df1, df2], axis=1)
 
-    df2_clean = df2_clean.drop(columns=cols) # Spalten aus df2_clean entfernen, um Suffix-Problem (_x, _y) beim Merge zu verhindern
-    df_merged = pd.merge(df1_clean, df2_clean, on=new_keys)
-    df_merged = df_merged.drop(columns=new_keys)
-    if (len(df1_clean) == len(df_merged)) and (len(df2_clean) == len(df_merged)):
-        print(f"---->  Vergleich erfolgreich! Anzahl der k-Punkte ohne Duplikate: {len(df1_clean)}")
-        print("---->  MME dem Dataframe der Energie hinzugefügt.")
-        return df_merged
+    # Sicherheitsüberprüfung
+    kx_match = df_merged["kx"] == df_merged["kx_mme"]
+    ky_match = df_merged["ky"] == df_merged["ky_mme"]
+    kz_match = df_merged["kz"] == df_merged["kz_mme"]
+    df_merged["k_points_match"] = kx_match & ky_match & kz_match
+
+    if df_merged["k_points_match"].all():
+        print(f"---->  Volle Übereinstimmung der Datenpunte. Vergleich erfolgreich! Anzahl der k-Punkte: {len(df_merged)}")
+        df_final = df_merged.drop(columns=["kx_mme", "ky_mme", "kz_mme", "k_points_match"])
     else:
-        print("WARNUNG: k-Punkte zwischen den Dataframes konnten nicht zugeordnet werden. Eventuell Parameter merge_decimals anpassen.")
-        return df
+        not_merged = df_merged[~df_merged["k_points_match"]]
+        print(f"----> WARNUNG: {len(not_merged)} Zeilen stimmen nich überein!")
+        df_final = df_merged
+    return df_final
+
 
 # --------------------------------------------------------------------------------------
 # Berechnung statistischer Größen für die Matrix-Impuls-Elemente
 # --------------------------------------------------------------------------------------
 
 def mme_statistics(df: list,
-                   df_mme: list,
-                   df_key: str,
-                   merge_decimals: int=None):
+                   df_key: str):
     """
     - Funktion berechnet statische Werte der Matrix-Impuls-Elemente von QE
         - Standardabweichung
@@ -1922,78 +1919,27 @@ def mme_statistics(df: list,
         - Variationskoeffizient
         - Spannweite
         - relativer maximaler Fehler
-    - Wenn merge_decimals nicht None, werden die Koordinaten kx,ky,kz beider Dataframes miteinander verglichen und die Energiewerte den Matrix-Impuls-Elementen zugeordnet. Dann werden die statistischen Werte nur für jede Punkte berechnet, bei denen die Zuordnung erfolgreich war. Dies dient dazu, die statischen Werte nur für den THz-aktiven Bereich zu bestimmen, wenn df vorher darauf zugeschnitten wird.
     Args:
         df:                 pandas Dataframe der Energie-Berechnung
-        df_mme:             pandas Dataframe der Matrix-Impuls-Elemente
         df_key:             key des pandas Dataframes, z.B: "px_abs2_14-15"
-        merge_decimals:     Anzahl der Nachkommastellen, auf denen die Dataframes miteinander verglichen werden
     """
-    p_key = df_mme[df_key]
+    p_key = df[df_key]
 
     # Standardabweichung
     p_std = np.std(p_key)
     print(f"----> Standardabweichung        {df_key}:   {p_std}")
-
     # Erwartungswert
     p_mean = np.mean(p_key)
     print(f"----> Erwartungswert            {df_key}:   {p_mean}")
-
     # Variationskoeffizient
     p_var = p_std/p_mean
     print(f"----> Variationskoeffizient     {df_key}:   {p_var}")
-
     # Spannweite
     p_spann = np.max(p_key)-np.min(p_key)
     print(f"----> Spannweite                {df_key}:   {p_spann}")
-
     # relativer maximaler Fehler
     p_rel = np.max([ np.abs(np.max(p_key)-p_mean) , np.abs(np.min(p_key)-p_mean) ]) / p_mean
-    print(f"----> relativer Maximalfehler   {df_key}:    {p_rel}\n")
-
-    # Vergleich beider Dataframes (z.B: für Statistik im THz-Bereich)
-    if merge_decimals is not None:
-        print("---->  Vergleich beider Dataframes df, df_mme")
-        decimals = merge_decimals
-        cols = ["kx", "ky", "kz"]
-        df1 = df.copy()
-        df2 = df_mme.copy()
-
-        new_keys = []
-        for col in cols:
-            new_keys.append(f"{col}_tmp")
-            df1[f"{col}_tmp"] = df1[col].round(decimals)
-            df2[f"{col}_tmp"] = df2[col].round(decimals)
-
-        # Doppelte Zeilen entfernen:
-        df1_clean = df1.drop_duplicates(subset=new_keys)
-        df2_clean = df2.drop_duplicates(subset=new_keys)
-
-        df_merged = pd.merge(df1_clean, df2_clean, on=new_keys)
-        df_merged = df_merged.drop(columns=new_keys)
-        print(f"---->  Vergleich erfolgreich. Länge der Zeilen ohne Duplikate:\n       df: {len(df1_clean)} Zeilen\n       df_mme: {len(df2_clean)} Zeilen\n       df_merged: {len(df_merged)} Zeilen.")
-
-        p_key = df_merged[df_key]
-
-        # Standardabweichung
-        p_std = np.std(p_key)
-        print(f"----> Standardabweichung        {df_key}:   {p_std}")
-
-        # Erwartungswert
-        p_mean = np.mean(p_key)
-        print(f"----> Erwartungswert            {df_key}:   {p_mean}")
-
-        # Variationskoeffizient
-        p_var = p_std/p_mean
-        print(f"----> Variationskoeffizient     {df_key}:   {p_var}")
-
-        # Spannweite
-        p_spann = np.max(p_key)-np.min(p_key)
-        print(f"----> Spannweite                {df_key}:   {p_spann}")
-
-        # relativer maximaler Fehler
-        p_rel = np.max([ np.abs(np.max(p_key)-p_mean) , np.abs(np.min(p_key)-p_mean) ]) / p_mean
-        print(f"----> relativer Maximalfehler   {df_key}:    {p_rel}\n")
+    print(f"----> relativer Maximalfehler   {df_key}:   {p_rel}\n")
 
 # --------------------------------------------------------------------------------------
 # Berechnung des Schnittpunktes

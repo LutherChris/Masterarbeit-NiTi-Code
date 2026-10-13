@@ -87,12 +87,12 @@ modeltype_path="path_point1"
 ## Main parameters 
 
 ```
-plot_grid = False                       # BLOCK 2
-calc_dft = False                        # BLOCK 3
-calc_mme = False; merge_decimals=10     # BLOCK 4
-analysis = False                        # BLOCK 5
-load_csv = False                        # BLOCK 6
-calc_model = False                      # BLOCK 7
+plot_grid = False   # BLOCK 2
+calc_dft = False    # BLOCK 3
+calc_mme = False    # BLOCK 4
+analysis = False    # BLOCK 5
+load_csv = False    # BLOCK 6
+calc_model = False  # BLOCK 7
 ```
 
 * The next part of the configuration file contains the main parameters to activate sections with `True` or deactivate them with `False`. 
@@ -333,7 +333,6 @@ The final configuration parameters do the following:
   Calculations like PCA-Analysis or coordinte transformations are written as new columns into the csv file.
   If a calculation of the momentum matrix elements was performed, the information from the QE `<prefix>_p_avg.dat` file is also read and relevant information is saved as `df_mme.csv`
 * After the momentum matrix elements are saved as `df_mme.csv`, the momentum matrix elements are added to the energy data frame as new columns.
-* The parameter `merge_decimals` specifies the number of decimal places used to map the coordinates of the MME calculation to the coordinates of the energy calculation.
 
 ## Loading the csv file (load_csv=True)
 * With `load_csv=True`, the previously calculated csv file can now be loaded.

@@ -191,7 +191,7 @@ def run(cfg):
         model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df", modeltype)
         return df
 
-    def make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cut_df_for_fit, mme_statistics):
+    def make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cut_df_for_fit):
         """
          - Lade Daten aus den Ausgabe-Dateien der QE-Berechnung 
             df_mme: p_avg.dat-file der Impulselemente-Berechnung
@@ -210,33 +210,16 @@ def run(cfg):
             print("Es liegen keine Matrix-Impuls-Elemente als p_avg.dat vor!")
             df_mme = None
 
-        # -------------------------------------------------------------------------------
-        # Berechnung statistischer Größen für die Matrix-Elemente (optional)
-        # -------------------------------------------------------------------------------
-        if mme_statistics:
-            print("- Berechnung statistische Größen der Matrix-Impuls-Elemente")
-            # Lade Original-Daten der Energie (verhindert den Fall, dass Koordinatentransformationen etc. durchgeführt wurden)
-            print("----> Lade Energie-Daten aus dem xml-File")
-            _, df = model.model_xml_to_df(cfg.k0, p_str, n_str, k_grid_center, cfg.datlabel, cfg.bandnumbers, t_grid, v_grid)
-            # Zuschneiden der Daten auf den THz-aktiven Bereich (optional)
-            if cut_df_for_fit: 
-                print("----> Zuschneiden der Energie-Daten auf den THz-aktiven Bereich")
-                df = model.model_cut_df_to_thz_range(df, cfg.cut_value_diff, cfg.cut_value_bands, cfg.coord_system, cfg.complete_cut)
-
-            # Berechnung statistischer Größen
-            print("----> Berechne statistische Größen")
-            model.mme_statistics(df, df_mme, cfg.df_key, cfg.merge_decimals)
-
         return df_mme
 
-    def make_merge_and_cut(df, df_mme, coord_system, cut_df_for_fit, no_000):
+    def make_merge_and_cut(df, df_mme, coord_system, cut_df_for_fit, no_000, mme_statistics):
         # -------------------------------------------------------------------------------
         # Matrix Elemente dem Dataframe der Energie hinzufügen
         # -------------------------------------------------------------------------------
         print("- Hinzufügen der Matrix Elemente zum Dataframe der Energie")
         # Dataframe der Energie zur Sicherheit vorher speichern
         model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df_energy", modeltype)
-        df = model.merge_df_dfmme(df, df_mme, merge_decimals=cfg.merge_decimals)
+        df = model.merge_df_dfmme(df, df_mme)
 
         # -------------------------------------------------------------------------------
         # Entfernung von 0-Werten aus den Daten (optional)
@@ -251,6 +234,13 @@ def run(cfg):
         if cut_df_for_fit: 
             print("- Zuschneiden der Daten auf den THz-aktiven Bereich")
             df = model.model_cut_df_to_thz_range(df, cfg.cut_value_diff, cfg.cut_value_bands, coord_system, cfg.complete_cut)
+
+        # -------------------------------------------------------------------------------
+        # Berechnung statistischer Größen für die Matrix-Elemente (optional)
+        # -------------------------------------------------------------------------------
+        if mme_statistics:
+            print("- Berechnung statistische Größen der Matrix-Impuls-Elemente")
+            model.mme_statistics(df, cfg.df_key)
 
         # -------------------------------------------------------------------------------
         # Speichern
@@ -344,8 +334,8 @@ def run(cfg):
     # -----------------------------------------------------------------------------------
     if cfg.analysis:
         df = make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, cfg.coord_system, cfg.grid_type, coord_basis, cfg.pca, cfg.find_intersection)
-        df_mme = make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cfg.cut_df_for_fit, cfg.mme_statistics)
-        df = make_merge_and_cut(df, df_mme, cfg.coord_system, cfg.cut_df_for_fit, cfg.no_000)
+        df_mme = make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cfg.cut_df_for_fit)
+        df = make_merge_and_cut(df, df_mme, cfg.coord_system, cfg.cut_df_for_fit, cfg.no_000, cfg.mme_statistics)
 
     # -----------------------------------------------------------------------------------
     # Laden der pandas-Dataframes

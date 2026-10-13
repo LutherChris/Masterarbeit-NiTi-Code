@@ -31,7 +31,7 @@ modeltype_path="path_point1"
 
 plot_grid = False
 calc_dft = False
-calc_mme = False; merge_decimals=10
+calc_mme = False
 analysis = False
 load_csv = False
 calc_model = False
@@ -74,7 +74,6 @@ cut_value_diff=0.0124; cut_value_bands=0.05; complete_cut=True
 
 # calculation of the statistical values ​​of the matrix momentum elements
 mme_statistics=False
-merge_decimals=10
 df_key = "px_abs2_14-15"
 
 # calculating the intersection point
