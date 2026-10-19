@@ -27,6 +27,8 @@ def run(cfg):
     a_coeffs = cfg.a_coeffs if hasattr(cfg, "a_coeffs") else (print("Achtung: 'a_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     b_coeffs = cfg.b_coeffs if hasattr(cfg, "b_coeffs") else (print("Achtung: 'b_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     modeltype_path = cfg.modeltype_path if hasattr(cfg, "modeltype_path") else (print("Achtung: 'modeltype_path' fehlt - noch keine Pfad-Berechnung? - setze: None"), None)[1]
+
+    
     
     # ###################################################################################
     # Hilfsfunktionen für:
@@ -190,8 +192,8 @@ def run(cfg):
         # -------------------------------------------------------------------------------
         model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df", modeltype)
         return df
-
-    def make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cut_df_for_fit):
+        
+    def make_analysis_mme(p_str, n_str):
         """
          - Lade Daten aus den Ausgabe-Dateien der QE-Berechnung 
             df_mme: p_avg.dat-file der Impulselemente-Berechnung
@@ -247,6 +249,21 @@ def run(cfg):
         # -------------------------------------------------------------------------------
         model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df", modeltype)
 
+        return df
+
+    def make_kubo(df, kubo_k):
+        # -------------------------------------------------------------------------------
+        # Laden der Originalenergien in Ry
+        # -------------------------------------------------------------------------------
+        df_original = model.model_load_df(p_str, n_str, cfg.datlabel, "df_original", modeltype)
+        if kubo_k:
+            print("- k-weise Berechnung der Kubo-Greenwood-Formel")
+            # Laden der Originalenergien in Ry
+            df = model.kubo_k(cfg.omega, cfg.temperature, cfg.eta, df, df_original, cfg.bandnumbers, cfg.unit_cell_volume)               
+        # -------------------------------------------------------------------------------
+        # Speichern
+        # -------------------------------------------------------------------------------
+        model.model_save_csv(df, p_str, n_str, cfg.datlabel, "df", modeltype)
         return df
 
     def make_model(p_str, n_str, df, orders, a0_correction):
@@ -334,7 +351,7 @@ def run(cfg):
     # -----------------------------------------------------------------------------------
     if cfg.analysis:
         df = make_analysis_energy(p, p_str, n_str, k_grid_center, t_grid, v_grid, cfg.coord_system, cfg.grid_type, coord_basis, cfg.pca, cfg.find_intersection)
-        df_mme = make_analysis_mme(p_str, n_str, k_grid_center, t_grid, v_grid, cfg.cut_df_for_fit)
+        df_mme = make_analysis_mme(p_str, n_str)
         df = make_merge_and_cut(df, df_mme, cfg.coord_system, cfg.cut_df_for_fit, cfg.no_000, cfg.mme_statistics)
 
     # -----------------------------------------------------------------------------------
@@ -343,12 +360,12 @@ def run(cfg):
     if cfg.load_csv:
         print("Laden der Pandas Dataframes")
         df = model.model_load_df(p_str, n_str, cfg.datlabel, "df", modeltype)
-        print(df)
+        #print(df)
 
         path_p_avg = config.path_p_avg_copy(cfg.datlabel, p_str, n_str)
         if os.path.exists(path_p_avg):
             df_mme = model.model_load_df(p_str, n_str, cfg.datlabel, "df_mme", modeltype)
-            print(df_mme)
+            #print(df_mme)
         else:
             print("Es liegt kein Dataframe mit den Matrixelementen vor!")
         print()
@@ -423,3 +440,15 @@ def run(cfg):
 
     #diff_max = np.max(df["diff"])
     #print(f"Maximale Bandendergie im Dataframe; {diff_max}")
+
+    # -----------------------------------------------------------------------------------
+    # Berechnungen zur Kubo-Greenwood-Formel
+    # -----------------------------------------------------------------------------------
+    if cfg.calc_kubo:
+        print("Berechnungen zur Kubo-Greenwood-Formel")
+
+        # -------------------------------------------------------------------------------
+        # Leitfähigkeit pro k-Punkt
+        # -------------------------------------------------------------------------------  
+        df = make_kubo(df, cfg.kubo_k)
+

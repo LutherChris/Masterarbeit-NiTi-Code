@@ -3,16 +3,19 @@
 The shape-memory alloy NiTi has two bands in its electronic structure in the B2 phase, which intersect at several points near the Fermi Level.
 As part of my master’s thesis, I developed precise low-energy models in the vicinity of the nodes.
 To this end, density functional theory calculations of the band structure of NiTi were performed using `Quantum ESPRESSO (QE) Version 7.6`.
+(https://gitlab.com/dft2kp/dft2kp/-/tree/main/patch)
+The code of `Quantum Espresso`is modified using the `dft2kp`-Patch. 
+(https://gitlab.com/dft2kp/dft2kp)
 
 This Python code is divided into five main modules.
 
-| Module    | Usage                                                                             |
-| --------- | --------------------------------------------------------------------------------- |
-| conv      | convergence tests of the self-consistency calculation of QE                       |
-| fermi     | plot of energy bands along high-symmetry lines in the Brillouin zone              |
-| thz       | investigation of THz environments using `bands.x`                                 |
-| model     | calculation and modelling of bands and band differences using `pw.x` and `bands.x`|
-| transport | calculation of transport properties using BoltzTrap2                              |
+| Module    | Usage                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| conv      | convergence tests of the self-consistency calculation of QE                                                 |
+| fermi     | plot of energy bands along high-symmetry lines in the Brillouin zone                                        |
+| thz       | investigation of THz environments using `bands.x`                                                           |
+| model     | calculation and modelling of bands, band differences and momentum matrix elements using `pw.x` and `bands.x`|
+| transport | calculation of transport properties using BoltzTrap2                                                        |
 
 Detailed tutorials can be found in the tutorials folder.
 
@@ -59,7 +62,7 @@ This module is divided into the submodules `calc`, `use`, `plot`, and `path`.
 
 In `calc`, the k-grid for calculations is defined and written to the QE input file in the Card block K_POINTS {crystal_b}.
 Various k-grids can be selected, for example, cartesian grids, cylindrical grids, or polar grids along a defined path.
-Subsequently, the band energies and the squared magnitudes of the matrix momentum elements between valence and conduction bands can be calculated using QE.
+Subsequently, the band energies and the momentum matrix elements can be calculated using QE.
 The generated files are stored in a clear folder structure.
 Following the DFT calculation, the XML files from QE are read in during the analysis phase, and the relevant information is saved as a CSV file.
 Before modeling the band energies, coordinate transformations, PCA analysis, or data filtering to the THz-active region can be performed.

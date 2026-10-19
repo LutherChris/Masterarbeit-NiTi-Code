@@ -46,8 +46,9 @@ Main parameters for activating code blocks are `highlighted`.
 | `analysis` | (bool) | 5. DataFrame calculation, analysis, and adjustment<br>- Activates analysis block after DFT calculation | False |
 | `load_csv` | (bool) | 6. Loading pandas DataFrames<br>- Activates loading CSV files after analysis | False |
 | `calc_model` | (bool) | 7. Modeling with loop over all orders | False |
+| `calc_kubo` | (bool) | 8. Calculating parts of the Kubo-Greenwood-Formula | False |
 
-# Parameters for 1. Grid Calculation
+# Parameters for BLOCK 1 Grid Calculation
 
 | Parameter | Data type | Description | Example |
 | --- | --- | --- | --- |
@@ -118,7 +119,7 @@ Meaning of parameter n for different grid types:
 | path_rho_sigmaB | (float) | Width/strength of radial Gaussian density around $\rho=0$ (Point 2A) as a function of $t$ | None |
 | path_no_rho0 | (bool) | Points with $\rho=0$ are not defined | False |
 
-# Basic parameters for 5. and 7.
+# Basic parameters for BLOCK 5 and BLOCK 7
 
 | Parameter | Data type | Description | Example |
 | --- | --- | --- | --- |
@@ -133,7 +134,7 @@ Meaning of parameter n for different grid types:
 | tol | (float) | Tolerance for non-orthogonality | 1e-7 |
 | xatol | (float) | Tolerance in minimum search function | 1e-8 |
 
-# Parameters for 5. DataFrame Calculation, Analysis, and Adjustment
+# Parameters for BLOCK 5 DataFrame Calculation, Analysis, and Adjustment
 
 ## Principal Component Analysis
 
@@ -170,7 +171,7 @@ Meaning of parameter n for different grid types:
 | `mme_statistics` | (bool) | Activates calculation of statistical values for momentum matrix elements | False |
 | df_key | (str) | quantity on which he statistical calculation is performed | "px_abs2_14-15" |
 
-# Parameters for 7. Model Calculation
+# Parameters for BLOCK 7 Model Calculation
 
 ## Omit 0-th polynomial orders?
 
@@ -232,3 +233,13 @@ Meaning of parameter n for different grid types:
 
 - Grid rotation does not work in angular coordinate systems because rotation is performed using a matrix and the number of data points per axis must remain constant.
 - During rotation, gradient and curvature calculations do not work (PCA). NumPy functions require a regular grid.
+
+# Parameters for BLOCK 8 Calculating parts of the Kubo-Greenwood-Formula
+
+| Parameter | Data type | Description | Example |
+| --- | --- | --- | --- |
+| `kubo_k` | (bool) | Calculating parts of the Kubo-Greenwood-Formula | True |
+| omega | (float) | Frequency in (1/s) | 3e-12 |
+| temperature | (float) | Temperature in (K) | 293 |
+| eta | (float) | Positive Parameter in Kubo-Greenwood formula in (1/s) | 0 |
+| unit_cell_volume | Volume of the unit cell in (a.u.)³| 176.8135 |

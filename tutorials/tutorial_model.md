@@ -92,7 +92,9 @@ calc_dft = False    # BLOCK 3
 calc_mme = False    # BLOCK 4
 analysis = False    # BLOCK 5
 load_csv = False    # BLOCK 6
+# -------------------
 calc_model = False  # BLOCK 7
+calc_kubo = False   # BLOCK 8
 ```
 
 * The next part of the configuration file contains the main parameters to activate sections with `True` or deactivate them with `False`. 
@@ -107,8 +109,10 @@ calc_model = False  # BLOCK 7
 | 5 | Calculation, analysis, and alignment of DataFrames |
 | 6 | Loading the DataFrames |
 | 7 | Modeling of the band energies or momentum matrix elements|
+| 8 | Calculations for the Kubo-Greenwood formula |
 
 * Note: The MME calculation supports the unofficial Quantum Espresso patch `dft2kp`, which can be found at: https://gitlab.com/dft2kp/dft2kp.
+* In Block 4 this patch is optional, but it is mandatory in Block 8.
 
 ## Configuration of some parameters for blocks 5 and 7
 
@@ -273,7 +277,7 @@ col_weighting = True
 # ------------------------------------------------------------
 save_errors = False
 ```
-The final configuration parameters do the following:
+The configuration parameters do the following:
 * The parameter `a0_correction` allows shifting the model curve by adjusting the first coefficient. 
   This is not useful for all models, but only when the first coefficient is the only constant term (e.g., in polynomial models). 
   The adjustment shifts the model so that at the center of the grid, the energy of the data matches the energy of the model. 
@@ -287,6 +291,69 @@ The final configuration parameters do the following:
   These maximum errors are saved as a csv file if `save_errors=True`.
   If this option is deactivated, the errors are still calculated and printed in the terminal, but they are not saved.
   Deactivating the save function is useful, if you do not want to overwrite a previously long calculation.
+
+## Configuration of calculations for the Kubo-Greenwood formula (Block 8)
+
+This section calculates parts of the Kubo-Greenwood formula, focusing on the interband components.
+The formula is given by:
+
+$$
+\sigma_{\alpha \beta}^{\text{inter}, SI}=
+-\frac{i\hbar e^{2}}{V m_{e}^{2}}
+\cdot \frac{\hbar^{2}}{a_{0}^{5} (2R_{y})^{2}}
+\sum\limits_{\vec{k}} w_{\vec{k}}
+\sum\limits_{n \neq m}
+\left( \frac{f_{n\vec{k}} -f_{m\vec{k}}}{\Delta_{nm}(\vec{k})} \right)
+\frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{2 R_{y}}+\Delta_{nm}(\vec{k})}
+\qquad \text{with} \quad
+\sum\limits_{\vec{k}}w_{\vec{k}}=1
+$$
+
+| Quantity | Value or Unit |
+| ---- | ---- |
+| $\sigma_{\alpha \beta}^{\text{inter}, SI}$ = Conductivity tensor of interband contributions | $[\sigma_{\alpha \beta}^{\text{inter}, SI}]=\frac{C^{2}}{J~s~m}$ |
+| $f_{n\vec{k}}=\frac{1}{\exp((E_{n}(\vec{k})-E_{f})/(k_{B}T))+1}$ = Fermi function | $[f_{n\vec{k}}]  = 1$<br>$[T]$ = K<br>$[E]= \text{Hartree}$<br>$[E_f] = \text{Hartree}$<br>$[k_B]=\frac{\text{Hartree}}{K}$ |
+| V = Volume of the unit cell | $[V]=(a.u.)^{3}$ |
+| $\Delta_{nm}(\vec{k})=E_n(\vec{k})-E_{m}(\vec{k})$ = Band difference | $[\Delta_{nm}(\vec{k})] = \text{Hartree}$ |
+| $P^{\alpha}_{nm}(\vec{k})=\langle n\vec{k} \| \hat{P}_{\alpha}\| m\vec{k} \rangle$ = Momentum matrix element | $[P^{\alpha}_{nm}(\vec{k})] = a.u.$ |
+| $\omega$ = Frequency | $[\omega] = \text{Hz} = \frac{1}{s}$ |
+| $\eta$  = Positive parameter | $\eta= \text{Hz} = \frac{1}{s}$ |
+| $\hbar$ = Reduced Planck constant | $\hbar = \frac{6.62607015 \cdot 10^{-34}}{2 \pi} J~s$<br>$\approx 1.0545718176461565 \cdot 10^{-34} J~s$ |
+| e = Elementary charge | $e = 1.602176634 \cdot 10^{-19}C$ |
+| $m_{e}$ = Electron mass | $m_{e} = 9.1093837139 \cdot 10^{-31} kg$ |
+| $a_{0}$ = Bohr radius | $a_{0}= 5.29177210544 \cdot 10^{-11} m$ |
+| $Ry$ = Rydberg energy | $R_{y} = 2.179872361030 \cdot 10^{-18} J$ <br> $E_{\text{Hartree}} = 2\cdot R_y = 4.35974472206 \cdot 10^{-18} J$ |
+| $k_B$ = Boltzmann constant | $k_{B}=\frac{1.380649 \cdot 10^{-23} \frac{J}{K}}{4.35974472206 \cdot 10^{-18} \frac{J}{\text{Hartree}}}$<br>$\approx 3.166811563562458 \cdot 10^{-6} \frac{\text{Hartree}}{K}$ |
+| $w_{\vec{k}}$ = Weights of the k-summation | $[w_{\vec{k}}]=1$ |
+
+```
+kubo_k = False
+unit_cell_volume = 176.8135 #(a.u.)^3
+omega = 3e-12 ; temperature = 293 ; eta = 0
+```
+* The parameter `kubo_k` calculates the Kubo-Greenwood summands for each individual $\vec{k}$-value and adds the result to the Pandas DataFrame.
+  The following is calculated for each k-value:
+
+$$
+\sigma_{\alpha \beta}^{\text{inter}, SI} (\vec{k})=
+-\frac{i\hbar e^{2}}{V m_{e}^{2}}
+\cdot \frac{\hbar^{2}}{a_{0}^{5} (2R_{y})^{2}}
+\sum\limits_{n \neq m}
+\left( \frac{f_{n\vec{k}} -f_{m\vec{k}}}{\Delta_{nm}(\vec{k})} \right)
+\frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{2R_{y}}+\Delta_{nm}(\vec{k})}
+$$
+* The parameters `omega`, `temperature`, `eta` and `unit_cell_volume` descibes the variables of the formula. 
+  The cell volume can be obtained from the QE SCF output file.
+
+| Parameter | Quantity | unit |
+| ---- | ---- | ---- |
+| `omega` | $\omega$ | $\text{Hz} = \frac{1}{s}$ |
+| `temperature` | $T$ |$K$ |
+| `eta` | $\eta$ | $\text{Hz} = \frac{1}{s}$ |
+| `unit_cell_volume` | V | $(a.u.)^{3}$ |
+
+* In addition, the square of the absolute value of the results is also saved for later plotting.
+* Furthermore, a mean value is calculated across all elements of the conductivity tensor and also added to the data frame.
 
 ## Code execution
 
@@ -327,18 +394,18 @@ The final configuration parameters do the following:
   * Afterwards, the `bands.x` calculation is performed, and the files of the configuration folder `<prefix>` are copied to `<prefix>_out/<suffix>`.
 * After the calculation the Parameter can be set to False: `calc_mme=False`.
 
-## Reading QE XML files, analyzing, and saving as CSV Files (analysis=True)
+### Reading QE XML files, analyzing, and saving as CSV Files (analysis=True)
 
 * After the DFT calculation, the analysis block (`analysis=True`) reads the Quantum Espresso XML files and saves the relevant information as a CSV file.
   Calculations like PCA-Analysis or coordinte transformations are written as new columns into the csv file.
   If a calculation of the momentum matrix elements was performed, the information from the QE `<prefix>_p_avg.dat` file is also read and relevant information is saved as `df_mme.csv`
 * After the momentum matrix elements are saved as `df_mme.csv`, the momentum matrix elements are added to the energy data frame as new columns.
 
-## Loading the csv file (load_csv=True)
+### Loading the csv file (load_csv=True)
 * With `load_csv=True`, the previously calculated csv file can now be loaded.
   This is useful if you want to test different models afterwards without having to run the analysis again.
 
-## Modeling of the band difference and the bands (calc_model=False)
+### Modeling of the band difference and the bands (calc_model=True)
 
 * With `calc_model=False` the model block is activated.
 * The csv files for this module are saved in the subfolder named after the `modeltype` parameter.
@@ -350,13 +417,25 @@ The files contain the following:
 
 | File | Contnt |
 | --- | --- |
-| prefix_df_originl.csv | Original QE data from the xml file, all bands, energies in Hartree |
+| prefix_df_originl.csv | Original QE data from the xml file, all bands |
 | prefix_df.csv | Data on which the calculations and modeling were performed. Selected bands only, energies in eV |
-| prefix_df_mme.csv | Data on momentum matrix elements |
+| prefix_df_mme.csv | Data of momentum matrix elements |
 | prefix_errors_energy.csv | Maximum errors at the data points of the entire grid for different combinations of orders. |
 | prefix_errors_thz_energy.csv | Maximum errors at the data points in the THz-active region for different combinations of orders.|
 | prefix_coeffs_energy.txt | Coefficients of the model calculation |
 
+## Calculating parts of the Kubo-Greenwood-Formula (calc_kubo=True)
+
+* The Kubo-Greenwood formula is evaluated at the k-points using `calc_kubo=True`.
+* The results are added to the CSV file `<prefix>_df.csv` as new columns.
+
+The new columns are labeled as follows:
+
+| Label $\text{where a1,a2} \in \{"px","py","pz"\}$ | Meaning |
+| ---- | ---- |
+| "sigma_{a1}{a2}" | components of the conductivity tensor |
+| ""sigma_{a1}{a2}_abs" | absolute value of the component |
+| "sigma_mean" | mean value |
 
 # General information about configuration files with "plot"
 
@@ -432,8 +511,8 @@ plot_titel = ""
   Functions that simply plot the QE data can basically plot any column of the CSV file.
   There are functions that evaluate the model at values between the grid points.
   These functions require that the model coefficients were also calculated for this axis.
-  The options are:
-	* "band0", "band1", "diff", "band0_model", "error_band0", "diff_model", "error_diff", "px", "py", "pz"
+  Examples are:
+	* "band0", "band1", "diff", "band0_model", "error_band0", "diff_model", "error_diff", "px_abs2_14-15", "sigma_pypy_abs", "sigma_mean"
 * The parameter `plot_title` sets the title for some plots.
 
 Subsequently, individual plots are activated or deactivated using main parameters.

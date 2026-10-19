@@ -619,7 +619,6 @@ def model_4Dplots(p: list,
         title:          Titel der Abbildung
         back:           alle Punkte sind Schwarz
         activate_plot_cube:      Soll ein Würfelgitter um die Daten geplottet werden?
-        **args:         zusätzliche Argumente, die ax.scatter() übergeben werden
     """ 
     # Falls das Würfelgitter geplottet wird, Festlegung dessen Seitenlängen
     pmax = np.max(p)

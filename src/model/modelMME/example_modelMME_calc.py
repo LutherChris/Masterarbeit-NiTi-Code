@@ -35,7 +35,9 @@ calc_dft = False
 calc_mme = False
 analysis = False
 load_csv = False
+# -------------------
 calc_model = False
+calc_kubo = False
 
 # --------------------------------------------------------------------------------------
 # basic parameters for 5th and 7th block.
@@ -104,6 +106,13 @@ col_weighting = True
 
 # saving the errors as a CSV file
 save_errors = False
+
+# ---------------------------------------------------------------------------------------
+# parameters for calculating the Kubo-Greenwood-Formular
+# ---------------------------------------------------------------------------------------
+kubo_k = False
+unit_cell_volume = 176.8135 #(a.u.)^3
+omega = 3e-12 ; temperature = 293 ; eta = 0
 
 if __name__ == "__main__":
     run(cfg=__import__(__name__))

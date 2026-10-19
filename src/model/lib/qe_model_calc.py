@@ -1325,14 +1325,14 @@ def calc_mme(p_str: str,
     path_nscf_in = config.path_nscf_in()
     path_nscf_in_out_directory = config.path_nscf_in_out_directory(datlabel, p_str, n_str)
 
-    # Überprüfe, ob der QE Patch dft2pk verwendet wird
+    # Überprüfe, ob der QE Patch dft2kp verwendet wird
     with open(path_bands_x_in, "r") as txt_file:
         for line in txt_file:
             lines = line.strip()
             # Leerzeichen und Punkte entfernen
             lines = lines.lower().replace(" ", "").replace(".", "")
             if "lallp=true" in lines:
-                print(f"----> dft2pk Parameter lallp=true in Eingabedatei {path_bands_x_in} gefunden.")
+                print(f"----> dft2kp Parameter lallp=true in Eingabedatei {path_bands_x_in} gefunden.")
 
     # log Funktion und Start des Log zum Speichern der Rechenzeiten
     start_time = None
@@ -1905,7 +1905,6 @@ def merge_df_dfmme(df: list,
         df_final = df_merged
     return df_final
 
-
 # --------------------------------------------------------------------------------------
 # Berechnung statistischer Größen für die Matrix-Impuls-Elemente
 # --------------------------------------------------------------------------------------
@@ -1940,6 +1939,84 @@ def mme_statistics(df: list,
     # relativer maximaler Fehler
     p_rel = np.max([ np.abs(np.max(p_key)-p_mean) , np.abs(np.min(p_key)-p_mean) ]) / p_mean
     print(f"----> relativer Maximalfehler   {df_key}:   {p_rel}\n")
+
+# --------------------------------------------------------------------------------------
+# Berechnung zusätzlicher Größen für das Dataframe
+# --------------------------------------------------------------------------------------
+
+def kubo_k(omega: float,
+           temperature: float,
+           eta: float, 
+           df: list,
+           df_original: list,
+           bandnumbers: list,
+           unit_cell_volume: float):
+    """
+    - Berechnung der Summanten der Kubo-Greenwood-Formel pro k-Wert
+    - Ergebnisse des Leitfähigkeitstensors für jeden k-Wert werden als neue Spalten dem Dataframe hinzugefügt
+    Args:
+        omega_thz:      Frequenz in Hz
+        temperature:    Temperatur in K
+        eta:            positiver Parameter
+        df:             Pandas Dataframe mit den Energien und MME
+        df_original:    Pandas Dataframe der Originaldaten der Energie in Ry
+        bandnumbers:    ausgewählte Bänder
+    Return:
+        df:             Das um die Tensoreinträg erweiterte Dataframe
+    """    
+    # benötigte Konstanten
+    kb = 3.166811563562458e-06 # [kb]=Ha/K
+    Ha = 4.35974472206e-18   # [Ha]=J
+    hbar = 1.0545718176461565e-34 # [hbar]= Js
+    fermi_energy = df_original["fermi_energy"][0] # [fermi_energy]=Ry
+    a0 = 5.29177210544e-11 # [a0]=m
+    ee = 1.602176634e-19 # [ee]=C
+    me = 9.1093837139e-31 # [me]=kg
+    vcell = unit_cell_volume # [vcell]=(a.u.)^3
+
+    def fermifunc(T,E):
+            # [T]=K, kb=[Ry/K]
+            beta = 1/(kb*T) # [beta]=Ry
+            return 1/( np.exp( beta*(E-fermi_energy) )+1 )
+
+    axis = ["px", "py", "pz"]
+
+    for a1 in axis:       # Index alpha
+        for a2 in axis:   # Index beta
+            # xx, xy, xz, yx, yy, yz, zx, zy, zz
+            part_nm = []
+            for n in bandnumbers:      # Index n
+                for m in bandnumbers:  # Index m
+                    if n != m :
+                        en = df_original[f"band{n}"]
+                        em = df_original[f"band{m}"]
+                        fn = fermifunc(temperature, en)
+                        fm = fermifunc(temperature, em)
+                        pnm_re = df[f"{a1}_re_{n}-{m}"]
+                        pnm_im = df[f"{a1}_im_{n}-{m}"]
+                        pmn_re = df[f"{a2}_re_{m}-{n}"]
+                        pmn_im = df[f"{a2}_im_{m}-{n}"]
+                        pnm = pnm_re + 1j * pnm_im
+                        pmn = pmn_re + 1j * pmn_im
+                        pp = pnm * pmn              # Produk  <l|p|k><k|p|l>
+                        omega_Ry = hbar*(omega+1j*eta)/Ha
+                        part_nm.append( (fn - fm)*pp / ( omega_Ry + en - em ) )
+            sum_nm = sum(part_nm)
+            # Vorfaktor
+            factor = ( -1j*(hbar)**3*(ee**2) ) / ( vcell*(me**2)*(a0**5)*(Ha**2) )
+            sum_nm_scaled = sum_nm*factor
+            df[f"sigma_{a1}{a2}"] = sum_nm_scaled
+            df[f"sigma_{a1}{a2}_abs"] = np.abs(sum_nm_scaled)
+            
+    # Mittelwert über alle Matrix-Elemente pro k-Punkt
+    cols = []
+    for a1 in axis:
+        for a2 in axis:
+            cols.append(f"sigma_{a1}{a2}_abs")
+    df["sigma_mean"] = df[cols].sum(axis=1)/len(cols)
+
+    return df
+
 
 # --------------------------------------------------------------------------------------
 # Berechnung des Schnittpunktes
