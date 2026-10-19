@@ -242,4 +242,4 @@ Meaning of parameter n for different grid types:
 | omega | (float) | Frequency in (1/s) | 3e-12 |
 | temperature | (float) | Temperature in (K) | 293 |
 | eta | (float) | Positive Parameter in Kubo-Greenwood formula in (1/s) | 0 |
-| unit_cell_volume | Volume of the unit cell in (a.u.)³| 176.8135 |
+| unit_cell_volume | (float) | Volume of the unit cell in (a.u.)³| 176.8135 |
