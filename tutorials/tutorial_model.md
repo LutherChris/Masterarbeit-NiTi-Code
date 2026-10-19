@@ -132,8 +132,8 @@ Next, the configuration is done via various parameters, starting with fundamenta
   * "px_abs2_14-15": squared magnitudes of the momentum matrix elements between the band 14 and 15
 
 * The parameter `coord_system` determines whether a coordinate transformation takes place. The logic works as follows:
-  * If the grid is **not** defined via path coordinates {$t, \rho, \phi$} and `coord_system="path"` is set, then the coordinate transformation {$x,y,z$} -> {$t,\rho,\phi$} is calculated numerically (if the coefficients are available).
-  * If `coord_system="xyz_scaled"`, the coordinate system {$x,y,z$} is scaled to the interval [-1,1].
+  * If the grid is **not** defined via path coordinates $\{t, \rho, \phi\}$ and `coord_system="path"` is set, then the coordinate transformation $\{x,y,z\}$ -> $\{t,\rho,\phi\}$ is calculated numerically (if the coefficients are available).
+  * If `coord_system="xyz_scaled"`, the coordinate system $\{x,y,z\}$ is scaled to the interval [-1,1].
     This is only possible in regular grids. 
     The coord systems of the code are explained in `parameters/parameters_of_model/parameters_of_calc.md`
 
@@ -212,7 +212,7 @@ intersect_point="point_1"
 * The parameter `cut_df_for_fit` crops the data to the THz-active region.
   The THz condition is defined in eV using `cut_value_diff` and `cut_value_bands`. 
   In this case, with the selected values, the following applies:
-  *  $\Delta E < 0.0124~eV$;  $E0 > -0.05~eV$;  $E1 < 0.05~eV$ 
+  *  $\Delta E < 0.0124eV$;  $E0 > -0.05eV$;  $E1 < 0.05eV$ 
   * Here, E0 is the lower band, E1 is the upper band, and $\Delta E$ is the band difference.
 
 * The parameter `complete_cut` determines whether the data should be cropped exactly to the definition of the THz-active region:
@@ -311,14 +311,14 @@ $$
 
 | Quantity | Value or Unit |
 | ---- | ---- |
-| $\sigma_{\alpha \beta}^{\text{inter}, SI}$ = Conductivity tensor of interband contributions | $[\sigma_{\alpha \beta}^{\text{inter}, SI}]=\frac{C^{2}}{J~s~m}$ |
+| $\sigma_{\alpha \beta}^{\text{inter}, SI}$ = Conductivity tensor of interband contributions | $[\sigma_{\alpha \beta}^{\text{inter}, SI}]=\frac{C^{2}}{Jsm}$ |
 | $f_{n\vec{k}}=\frac{1}{\exp((E_{n}(\vec{k})-E_{f})/(k_{B}T))+1}$ = Fermi function | $[f_{n\vec{k}}]  = 1$<br>$[T]$ = K<br>$[E]= \text{Hartree}$<br>$[E_f] = \text{Hartree}$<br>$[k_B]=\frac{\text{Hartree}}{K}$ |
 | V = Volume of the unit cell | $[V]=(a.u.)^{3}$ |
 | $\Delta_{nm}(\vec{k})=E_n(\vec{k})-E_{m}(\vec{k})$ = Band difference | $[\Delta_{nm}(\vec{k})] = \text{Hartree}$ |
 | $P^{\alpha}_{nm}(\vec{k})=\langle n\vec{k} \| \hat{P}_{\alpha}\| m\vec{k} \rangle$ = Momentum matrix element | $[P^{\alpha}_{nm}(\vec{k})] = a.u.$ |
 | $\omega$ = Frequency | $[\omega] = \text{Hz} = \frac{1}{s}$ |
 | $\eta$  = Positive parameter | $\eta= \text{Hz} = \frac{1}{s}$ |
-| $\hbar$ = Reduced Planck constant | $\hbar = \frac{6.62607015 \cdot 10^{-34}}{2 \pi} J~s$<br>$\approx 1.0545718176461565 \cdot 10^{-34} J~s$ |
+| $\hbar$ = Reduced Planck constant | $\hbar = \frac{6.62607015 \cdot 10^{-34}}{2 \pi} Js$<br>$\approx 1.0545718176461565 \cdot 10^{-34} Js$ |
 | e = Elementary charge | $e = 1.602176634 \cdot 10^{-19}C$ |
 | $m_{e}$ = Electron mass | $m_{e} = 9.1093837139 \cdot 10^{-31} kg$ |
 | $a_{0}$ = Bohr radius | $a_{0}= 5.29177210544 \cdot 10^{-11} m$ |
@@ -492,9 +492,9 @@ plot_titel = ""
 * Next, it is defined whether the data is filtered before plotting.
   Analogous to the calculation, the filtering criterion is defined by the parameters `cut_value_diff` and `cut_value_bands`. 
   Unlike in the calculation, the three filter criteria can be activated individually.
-	* `thz_cut_diff=True` activates $\Delta E < 0.0124~eV$
-	* `thz_cut_band0=True` activates $E_0 > -0.05~eV$
-	* `thz_cut_band1=True` activates $E_1 < 0.05~eV$
+	* `thz_cut_diff=True` activates $\Delta E < 0.0124eV$
+	* `thz_cut_band0=True` activates $E_0 > -0.05eV$
+	* `thz_cut_band1=True` activates $E_1 < 0.05eV$
 	* If all three parameters are set to `True`, the data is filtered to the THz-active region.
 
 * Then, the $\vec{k}$ axes in the plot are defined via the parameter `coord_system`.
