@@ -20,6 +20,7 @@ def run(cfg):
     a_coeffs = cfg.a_coeffs if hasattr(cfg, "a_coeffs") else (print("Achtung: 'a_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     b_coeffs = cfg.b_coeffs if hasattr(cfg, "b_coeffs") else (print("Achtung: 'b_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     symmetry = cfg.symmetry if hasattr(cfg, "symmetry") else (print("Achtung: 'symmetry' fehlt - setze Standard: '1'"), 1)[1]
+    filter_atol = cfg.filter_atol if hasattr(cfg, "filter_atol") else (print("Achtung: 'filter_atol' fehlt - setze Standard: '1e-8'"), 1e-8)[1]
 
     orders = (cfg.p_order, cfg.f_order, cfg.l_order, cfg.k_order, cfg.p1_order, cfg.p2_order, cfg.p3_order)
     print()
@@ -103,6 +104,13 @@ def run(cfg):
     else:
         df_plots = df
 
+    # --------------------------------------------------------------------------------------
+    # Filterung des Dataframes
+    # --------------------------------------------------------------------------------------
+    if cfg.filter_df:
+        df_plots = plot.filter_df(df_plots, cfg.filter_col, cfg.filter_values, cfg.filter_min, cfg.filter_max, atol=filter_atol)
+
+
     # -----------------------------------------------------------------------------------
     # 2D - Sliderpolts
     # -----------------------------------------------------------------------------------
@@ -126,9 +134,6 @@ def run(cfg):
     # -----------------------------------------------------------------------------------
     if cfg.plot_4Dplots:
         plot.model_4Dplots(p, df_plots, (axes[0], axes[1], axes[2], cfg.plot_energy_axis), cfg.plot_titel, black=cfg.black_plot, activate_plot_cube=cfg.plot_cube)
-
-    if cfg.plot_4Dplots_mme_in_thz:
-        plot.model_4Dplots_mme_in_thz(p, df, df_mme, (axes[0], axes[1], axes[2], cfg.plot_energy_axis), cfg.plot_titel, cfg.merge_decimals)
 
     # -----------------------------------------------------------------------------------
     # Gradienten

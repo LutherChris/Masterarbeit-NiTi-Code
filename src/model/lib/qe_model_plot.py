@@ -9,6 +9,29 @@ from lib.qe_model_calc import load_model
 from lib.qe_model_calc import load_path
 from lib.plot_config import FIGWIDTH, HFACTOR, SCATTER_CONFIG, BBOX, DATEIENNAME, SHOW, SAVE, TITEL
 
+
+# --------------------------------------------------------------------------------------
+# Filterung des Dataframes
+# --------------------------------------------------------------------------------------
+
+def filter_df(df, col=None, values=None, min_value=None, max_value=None, atol=1e-8):
+    """
+    Zeilenfilter mit optionaler Wertliste und/oder Wertebereich.
+    - values: Liste von Zielwerten (mit Toleranz verglichen)
+    - min_value/max_value: geschlossener Wertebereich
+    """
+    mask = np.ones(len(df), dtype=bool)
+    if values is not None:
+        m = np.zeros(len(df), dtype=bool)
+        for t in values:
+            m |= np.isclose(df[col].to_numpy(), t, atol=atol)
+        mask &= m
+    if min_value is not None:
+        mask &= (df[col] >= min_value).to_numpy()
+    if max_value is not None:
+        mask &= (df[col] <= max_value).to_numpy()
+    return df.loc[mask].copy()
+
 # --------------------------------------------------------------------------------------
 # 2D - Sliderpolts
 # --------------------------------------------------------------------------------------
@@ -691,70 +714,6 @@ def model_4Dplots(p: list,
         plt.savefig(f"{DATEIENNAME}.pdf", bbox_inches=BBOX)
     if SHOW:
         
-        plt.show()
-
-def model_4Dplots_mme_in_thz(p: list,
-                             df: list,
-                             df_mme: list,
-                             axes: list,
-                             title: str,
-                             merge_decimals = None,
-                             activate_plot_cube = False):
-    """
-    - Funktion verwendet plot_cube als Hilfsfunktion
-
-    - Funktion entnimmt dem Dataframe df die Koordinaten (x1,y1,z1) und dem Dataframe df_mme die Daten (x2,y2,z2,p)
-    - Wenn merge_decimals=None, werden die Daten (x2,y2,z2,p) geplottet.
-    - Falls merge_decimals!=None, erfolgt eine Zuordnung zwischen (x1,y1,z1) und (x2,y2,z2) -> (x,y,z). Dabei gibt merge_decimals die Nachkommastelle an, auf die beide Dataframes für die Zuordnung gerundet werden. Dann wird (x1,y1,z1) in schwarz und (x,y,z,p) in Rot geplottet.
-    
-    Args:
-        p:              Gitterlängen-array bzw. float des Gitters
-        df:             Dataframe mit den Energien
-        df_mme:         Dataframe mit den Matrix-Impuls-Elementen
-        axes:           Welche Achsen sollen verwendet werden?
-                        Beispiel: axes = ("x", ""y", "z", "px")
-        title:          Titel der Abbildung
-        merge_decimals: aktiviert die Zuordnung der Koordinatensysteme
-        activate_plot_cube:      Soll ein Würfelgitter um die Daten geplottet werden?
-        **args:         zusätzliche Argumente, die ax.scatter() übergeben werden
-    """
-    # Falls der Würfelgitter geplottet wird, Festlegung dessen Seitenlängen
-    pmax = np.max(p)
-    if axes[0] == "x_scaled":
-        cube_min = -1
-        cube_max = 1
-    else:
-        cube_min = -pmax
-        cube_max = pmax
-
-    # Erstellung der Abbildung  
-    fig = plt.figure(figsize=(FIGWIDTH,FIGWIDTH*HFACTOR))
-    ax = fig.add_subplot(projection='3d')
-
-    # Plot des Würfelgitters
-    if activate_plot_cube:
-        plot_cube(ax, bounds=(cube_min,cube_max), alpha=0.0, face_color='cyan', edge_color='black', edge_width=1)
-
-    # Plot der Daten
-    if merge_decimals is not None:
-        df_merged = pd.merge(df.round(merge_decimals), df_mme.round(merge_decimals), on=['kx', 'ky', "kz"], how='inner')
-        ax.scatter(df[f"{axes[0]}"], df[f"{axes[1]}"], df[f"{axes[2]}"], c="black", zorder=1, alpha=0.1, **SCATTER_CONFIG)
-        ax.scatter(df_merged[f"{axes[0]}"], df_merged[f"{axes[1]}"], df_merged[f"{axes[2]}"], c="red", zorder=1, **SCATTER_CONFIG)
-    else:
-        ax.scatter(df[f"{axes[0]}"], df[f"{axes[1]}"], df[f"{axes[2]}"], c="black", zorder=1, alpha=0.1, **SCATTER_CONFIG)
-        ax.scatter(df_mme[f"{axes[0]}"], df_mme[f"{axes[1]}"], df_mme[f"{axes[2]}"], c="red", zorder=1, **SCATTER_CONFIG)
-
-    # Achsenbeschriftung
-    ax.set(xlabel=f"{axes[0]}", ylabel=f"{axes[1]}", zlabel=f"{axes[2]}")
-    ax.axis("equal")
-
-    if TITEL:
-        plt.title(f"{title}")   
-    if SAVE:
-        plt.savefig(f"{DATEIENNAME}.jpg", bbox_inches=BBOX)
-        plt.savefig(f"{DATEIENNAME}.png", bbox_inches=BBOX)
-        plt.savefig(f"{DATEIENNAME}.pdf", bbox_inches=BBOX)
-    if SHOW:
         plt.show()
 
 # --------------------------------------------------------------------------------------

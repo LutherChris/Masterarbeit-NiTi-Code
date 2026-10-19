@@ -46,6 +46,15 @@ Main parameters for activating code blocks are `highlighted`.
 | cut_value_diff | (float) | For the band difference in eV | 0.009 |
 | cut_value_bands | (float) | For the bands in eV | 0.05 |
 
+| Parameter | Data Type | Description | Example |
+| --- | --- | --- | --- |
+| `filter_df` | (bool) | Activates filtering of a specific axis | True |
+| filter_col | (str) | Defines the axis by which the filter is applied | "sigma_trace_abs" |
+| filter_values | (list) | ​​defines a list of target values |  |
+| filter_atol | (float) | Tolerance of the comparison | 1e-8 |
+| min_value | (float) | minimum value of a closed interval | 1e-6 |
+| max_value | (float) | maximum value of a closed interval | 1 |
+
 # Plot Configuration
 
 ## Energy Axis for All Plots

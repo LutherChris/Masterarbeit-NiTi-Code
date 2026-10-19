@@ -14,6 +14,7 @@ from BoltzTraP2 import units
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from sklearn.decomposition import PCA
 from sklearn.linear_model import RidgeCV
+from scipy.special import expit
 
 import lib.config as config
 import lib.qe_model_models as models
@@ -234,8 +235,8 @@ def cylindrical_grid(k0: list,
     k0 = np.array(k0)
 
     # Anzahl der Punkte pro Koordinatenachse
-    if n[1] % 2 == 0:
-        raise ValueError("n[0]=n_phi muss ungerade sein!")
+    #if n[1] % 2 == 0:
+    #    raise ValueError("n[0]=n_phi muss ungerade sein!")
     if n[2] % 2 == 0:
         raise ValueError("n[0]=n_z muss ungerade sein!")
     
@@ -1955,32 +1956,51 @@ def kubo_k(omega: float,
     - Berechnung der Summanten der Kubo-Greenwood-Formel pro k-Wert
     - Ergebnisse des Leitfähigkeitstensors für jeden k-Wert werden als neue Spalten dem Dataframe hinzugefügt
     Args:
-        omega_thz:      Frequenz in Hz
+        omega:          Frequenz in rad/s
         temperature:    Temperatur in K
-        eta:            positiver Parameter
-        df:             Pandas Dataframe mit den Energien und MME
-        df_original:    Pandas Dataframe der Originaldaten der Energie in Ry
-        bandnumbers:    ausgewählte Bänder
+        eta:            positiver Parameter in rad/s
+        df:             Pandas Dataframe für MME in (a.u.)
+        df_original:    Pandas Dataframe der Energien in Hartree
+        bandnumbers:    Liste ausgewählter Bänder
+        unit_cell_volume: Volumen der Einheitszelle in (a.u.)^3
     Return:
         df:             Das um die Tensoreinträg erweiterte Dataframe
     """    
+
+    for c in ("kx", "ky", "kz"):
+        if c not in df.columns or c not in df_original.columns:
+            raise KeyError(f"Spalte '{c}' fehlt in df oder df_original.")
+
+    if not df.index.equals(df_original.index):
+        raise ValueError("Zeilenindizes von df und df_original sind nicht identisch "
+                        "- die Zuordnung Impulselement -> Bandenergie waere falsch!")
+
+    if not np.allclose(df[["kx","ky","kz"]].to_numpy(),
+                    df_original[["kx","ky","kz"]].to_numpy(), atol=1e-10):
+        raise ValueError("Die k-Werte von df und df_original stimmen nicht ueberein!")
+        
     # benötigte Konstanten
-    kb = 3.166811563562458e-06 # [kb]=Ha/K
-    Ha = 4.35974472206e-18   # [Ha]=J
+    kb = 3.166811563562458e-06 # [kb]=Hartree/K
+    Ry = 2.179872361030e-18   # [Ry]=J
+    Ha = 2*Ry
     hbar = 1.0545718176461565e-34 # [hbar]= Js
-    fermi_energy = df_original["fermi_energy"][0] # [fermi_energy]=Ry
+    fermi_energy = df_original["fermi_energy"].iloc[0] # [fermi_energy]=Hartree
     a0 = 5.29177210544e-11 # [a0]=m
     ee = 1.602176634e-19 # [ee]=C
-    me = 9.1093837139e-31 # [me]=kg
     vcell = unit_cell_volume # [vcell]=(a.u.)^3
 
     def fermifunc(T,E):
-            # [T]=K, kb=[Ry/K]
-            beta = 1/(kb*T) # [beta]=Ry
-            return 1/( np.exp( beta*(E-fermi_energy) )+1 )
+            # [T]=K, kb=[Ha/K]
+            if T <= 0:
+                raise ValueError(f"Warnung: Temperatur sollte größer als 0 sein.")
+            return expit(-(E - fermi_energy)/(kb*T)) 
+
+    omega_Ha = hbar * (omega + 1j * eta) / Ha          # Frequenz in Hartree
+    occ = {n: fermifunc(temperature, df_original[f"band{n}"]) for n in bandnumbers}
+    en  = {n: df_original[f"band{n}"] for n in bandnumbers}
+    factor = -1j * ee**2 / (vcell * hbar * a0)         # = e²/(ħa₀) · (-i/V)
 
     axis = ["px", "py", "pz"]
-
     for a1 in axis:       # Index alpha
         for a2 in axis:   # Index beta
             # xx, xy, xz, yx, yy, yz, zx, zy, zz
@@ -1988,32 +2008,30 @@ def kubo_k(omega: float,
             for n in bandnumbers:      # Index n
                 for m in bandnumbers:  # Index m
                     if n != m :
-                        en = df_original[f"band{n}"]
-                        em = df_original[f"band{m}"]
-                        fn = fermifunc(temperature, en)
-                        fm = fermifunc(temperature, em)
+                        fn = occ[n]
+                        fm = occ[m]
                         pnm_re = df[f"{a1}_re_{n}-{m}"]
                         pnm_im = df[f"{a1}_im_{n}-{m}"]
                         pmn_re = df[f"{a2}_re_{m}-{n}"]
                         pmn_im = df[f"{a2}_im_{m}-{n}"]
                         pnm = pnm_re + 1j * pnm_im
                         pmn = pmn_re + 1j * pmn_im
-                        pp = pnm * pmn              # Produk  <l|p|k><k|p|l>
-                        omega_Ry = hbar*(omega+1j*eta)/Ha
-                        part_nm.append( (fn - fm)*pp / ( omega_Ry + en - em ) )
-            sum_nm = sum(part_nm)
-            # Vorfaktor
-            factor = ( -1j*(hbar)**3*(ee**2) ) / ( vcell*(me**2)*(a0**5)*(Ha**2) )
+                        pp = pnm * pmn              # Produk  <n|p|m><m|p|n>
+                        delta = en[n] - en[m]
+                        part_nm.append( (fn - fm)*pp / ( delta * (omega_Ha + delta ) ) )
+            sum_nm = sum(part_nm)            
             sum_nm_scaled = sum_nm*factor
             df[f"sigma_{a1}{a2}"] = sum_nm_scaled
-            df[f"sigma_{a1}{a2}_abs"] = np.abs(sum_nm_scaled)
+            df[f"sigma_{a1}{a2}_abs"] = np.abs(sum_nm_scaled.to_numpy())
+            df[f"sigma_{a1}{a2}_real"] = np.real(sum_nm_scaled.to_numpy())
+            df[f"sigma_{a1}{a2}_imag"] = np.imag(sum_nm_scaled.to_numpy())
             
     # Mittelwert über alle Matrix-Elemente pro k-Punkt
-    cols = []
-    for a1 in axis:
-        for a2 in axis:
-            cols.append(f"sigma_{a1}{a2}_abs")
-    df["sigma_mean"] = df[cols].sum(axis=1)/len(cols)
+    cols = ["sigma_pxpx", "sigma_pypy", "sigma_pzpz"]
+    df["sigma_trace"] = df[cols].sum(axis=1) / 3        # Tr(σ)/3
+    df["sigma_trace_abs"] = np.abs(df["sigma_trace"].to_numpy())
+    df["sigma_trace_real"] = np.real(df["sigma_trace"].to_numpy())
+    df["sigma_trace_imag"] = np.imag(df["sigma_trace"].to_numpy())
 
     return df
 

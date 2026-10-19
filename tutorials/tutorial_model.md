@@ -483,6 +483,11 @@ p3_order = 0
 thz_cut_diff=False; thz_cut_band0=False; thz_cut_band1=False
 cut_value_diff=0.0124; cut_value_bands=0.05
 # ------------------------------------------------------------
+filter_df=False
+filter_col="sigma_trace_abs"
+filter_values=None; filter_tol=1e-8
+filter_min=1e-9; filter_max=None
+# ------------------------------------------------------------
 coord_system = "path"
 # ------------------------------------------------------------
 plot_energy_axis = "diff"
@@ -496,6 +501,12 @@ plot_titel = ""
 	* `thz_cut_band0=True` activates $E_0 > -0.05eV$
 	* `thz_cut_band1=True` activates $E_1 < 0.05eV$
 	* If all three parameters are set to `True`, the data is filtered to the THz-active region.
+
+* Then, it is then possible to filter the data with respect to a specific axis.
+  The parameter `filter_df` activates this filtering.
+  * `filter_col` defines the axis by which the filter is applied. 
+  * `filter_values` ​​defines a list of target values. (is compared with tolerance `filter_atol`)
+  * Alternatively, a closed interval can be defined using the parameters `min_value` and `max_value`.
 
 * Then, the $\vec{k}$ axes in the plot are defined via the parameter `coord_system`.
   Not all plotting functions can handle all coordinate systems.
