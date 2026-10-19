@@ -315,7 +315,7 @@ $$
 | $f_{n\vec{k}}=\frac{1}{\exp((E_{n}(\vec{k})-E_{f})/(k_{B}T))+1}$ = Fermi function | $[f_{n\vec{k}}]  = 1$<br>$[T]$ = K<br>$[E]= \text{Hartree}$<br>$[E_f] = \text{Hartree}$<br>$[k_B]=\frac{\text{Hartree}}{K}$ |
 | V = Volume of the unit cell | $[V]=(a.u.)^{3}$ |
 | $\Delta_{nm}(\vec{k})=E_n(\vec{k})-E_{m}(\vec{k})$ = Band difference | $[\Delta_{nm}(\vec{k})] = \text{Hartree}$ |
-| $P^{\alpha}_{nm}(\vec{k})=\langle n\vec{k} \| \hat{P}_{\alpha}\| m\vec{k} \rangle$ = Momentum matrix element | $[P^{\alpha}_{nm}(\vec{k})] = a.u.$ |
+| $P^{\alpha}_{nm}(\vec{k})=\langle n\vec{k} | \hat{P}_{\alpha} | m\vec{k} \rangle$ = Momentum matrix element | $[P^{\alpha}_{nm}(\vec{k})] = a.u.$ |
 | $\omega$ = Frequency | $[\omega] = \text{Hz} = \frac{1}{s}$ |
 | $\eta$  = Positive parameter | $\eta= \text{Hz} = \frac{1}{s}$ |
 | $\hbar$ = Reduced Planck constant | $\hbar = \frac{6.62607015 \cdot 10^{-34}}{2 \pi} Js$<br>$\approx 1.0545718176461565 \cdot 10^{-34} Js$ |
