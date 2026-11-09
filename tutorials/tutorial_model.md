@@ -129,7 +129,6 @@ Next, the configuration is done via various parameters, starting with fundamenta
   * "diff": band difference
   * "band0": lower band
   * "band1": upper band
-  * "px_abs2_14-15": squared magnitudes of the momentum matrix elements between the band 14 and 15
 
 * The parameter `coord_system` determines whether a coordinate transformation takes place. The logic works as follows:
   * If the grid is **not** defined via path coordinates $\{t, \rho, \phi\}$ and `coord_system="path"` is set, then the coordinate transformation $\{x,y,z\}$ -> $\{t,\rho,\phi\}$ is calculated numerically (if the coefficients are available).
@@ -294,17 +293,26 @@ The configuration parameters do the following:
 
 ## Configuration of calculations for the Kubo-Greenwood formula (Block 8)
 
-This section calculates parts of the Kubo-Greenwood formula, focusing on the interband components.
-The formula is given by:
-
+This section calculates the conductivity based on the Kubo-Greenwood formula in SI-Units.
+For interband contributions:
 $$
 \sigma_{\alpha \beta}^{\text{inter}, SI}=
--\frac{i\hbar e^{2}}{V m_{e}^{2}}
-\cdot \frac{\hbar^{2}}{a_{0}^{5} (2R_{y})^{2}}
+-\frac{i e^{2}}{V  \hbar a_{0}}
 \sum\limits_{\vec{k}} w_{\vec{k}}
 \sum\limits_{n \neq m}
 \left( \frac{f_{n\vec{k}} -f_{m\vec{k}}}{\Delta_{nm}(\vec{k})} \right)
-\frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{2 R_{y}}+\Delta_{nm}(\vec{k})}
+\frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{(2R_{y})}+\Delta_{nm}(\vec{k})}
+\qquad \text{with} \quad
+\sum\limits_{\vec{k}}w_{\vec{k}}=1
+$$
+For intraband-contributions:
+$$
+\sigma_{\alpha \beta}^{\text{intra}, SI}=
+\frac{i e^{2} (2 R_{y})}{V  \hbar^{2} a_{0} (\omega+i\eta)k_{B}T}
+\sum\limits_{\vec{k}} w_{\vec{k}}
+\sum\limits_{n}
+f(E_{n})\left(1-f(E_{n})\right)
+P^{\alpha}_{nn}(\vec{k}) P^{\beta}_{nn} (\vec{k})
 \qquad \text{with} \quad
 \sum\limits_{\vec{k}}w_{\vec{k}}=1
 $$
@@ -312,48 +320,38 @@ $$
 | Quantity | Value or Unit |
 | ---- | ---- |
 | $\sigma_{\alpha \beta}^{\text{inter}, SI}$ = Conductivity tensor of interband contributions | $[\sigma_{\alpha \beta}^{\text{inter}, SI}]=\frac{C^{2}}{Jsm}$ |
+| $\sigma_{\alpha \beta}^{\text{intra}, SI}$ = Conductivity tensor of intraband contributions | $[\sigma_{\alpha \beta}^{\text{intra}, SI}]=\frac{C^{2}}{Jsm}$ |
 | $f_{n\vec{k}}=\frac{1}{\exp((E_{n}(\vec{k})-E_{f})/(k_{B}T))+1}$ = Fermi function | $[f_{n\vec{k}}]  = 1$<br>$[T]$ = K<br>$[E]= \text{Hartree}$<br>$[E_f] = \text{Hartree}$<br>$[k_B]=\frac{\text{Hartree}}{K}$ |
 | V = Volume of the unit cell | $[V]=(a.u.)^{3}$ |
 | $\Delta_{nm}(\vec{k})=E_n(\vec{k})-E_{m}(\vec{k})$ = Band difference | $[\Delta_{nm}(\vec{k})] = \text{Hartree}$ |
 | $P^{\alpha}_{nm}(\vec{k})$ = Momentum matrix element | $[P^{\alpha}_{nm}(\vec{k})] = a.u.$ |
-| $\omega$ = Frequency | $[\omega] = \text{Hz} = \frac{1}{s}$ |
-| $\eta$  = Positive parameter | $\eta= \text{Hz} = \frac{1}{s}$ |
+| $\omega$ = Frequency | $[\omega] = \frac{rad}{s}$ |
+| $\eta$  = Positive parameter | $\eta = \frac{rad}{s}$ |
 | $\hbar$ = Reduced Planck constant | $\hbar = \frac{6.62607015 \cdot 10^{-34}}{2 \pi} Js$<br>$\approx 1.0545718176461565 \cdot 10^{-34} Js$ |
 | e = Elementary charge | $e = 1.602176634 \cdot 10^{-19}C$ |
-| $m_{e}$ = Electron mass | $m_{e} = 9.1093837139 \cdot 10^{-31} kg$ |
 | $a_{0}$ = Bohr radius | $a_{0}= 5.29177210544 \cdot 10^{-11} m$ |
-| $Ry$ = Rydberg energy | $R_{y} = 2.179872361030 \cdot 10^{-18} J$ <br> $E_{\text{Hartree}} = 2\cdot R_y = 4.35974472206 \cdot 10^{-18} J$ |
+| $Ry$ = Rydberg energy | $R_{y} = 2.179872361030 \cdot 10^{-18} J$ |
 | $k_B$ = Boltzmann constant | $k_{B}=\frac{1.380649 \cdot 10^{-23} \frac{J}{K}}{4.35974472206 \cdot 10^{-18} \frac{J}{\text{Hartree}}}$<br>$\approx 3.166811563562458 \cdot 10^{-6} \frac{\text{Hartree}}{K}$ |
 | $w_{\vec{k}}$ = Weights of the k-summation | $[w_{\vec{k}}]=1$ |
 
+In addition, the reflection coefficient $\alpha$ is calculated using:
+$$n = Re\left[ \sqrt{\epsilon_{r} + \frac{i \sigma}{\omega\epsilon_{0}}}~ \right]$$
+$$\alpha = \frac{2\omega \xi}{c}= \frac{Re[\sigma]}{cn\epsilon_{0}}$$
+
+
 ```
 kubo_k = False
+sigma_weights = None
 unit_cell_volume = 176.8135 #(a.u.)^3
+epsilon_r = 1
 omega = 3e-12 ; temperature = 293 ; eta = 0
 ```
-* The parameter `kubo_k` calculates the Kubo-Greenwood summands for each individual $\vec{k}$-value and adds the result to the Pandas DataFrame.
-  The following is calculated for each k-value:
-
-$$
-\sigma_{\alpha \beta}^{\text{inter}, SI} (\vec{k})=
--\frac{i\hbar e^{2}}{V m_{e}^{2}}
-\cdot \frac{\hbar^{2}}{a_{0}^{5} (2R_{y})^{2}}
-\sum\limits_{n \neq m}
-\left( \frac{f_{n\vec{k}} -f_{m\vec{k}}}{\Delta_{nm}(\vec{k})} \right)
-\frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{2R_{y}}+\Delta_{nm}(\vec{k})}
-$$
-* The parameters `omega`, `temperature`, `eta` and `unit_cell_volume` descibes the variables of the formula. 
+* The parameter `kubo_k` activates the calculation and adds the results to the Pandas DataFrame.
+* The parameter `sigma_weights` describes the weighting at each k-point using a list.
+  If `sigma_weights=None`, a regular grid is assumed and $w_{\vec{k}}$ is set to $1/N_{\vec{k}}$, where  $N_{\vec{k}}$ is the number of k points.
+* The parameters `unit_cell_volume`, `epsilon_r`, `omega`, `temperature` and `eta` descibes the variables of the formula. 
   The cell volume can be obtained from the QE SCF output file.
 
-| Parameter | Quantity | unit |
-| ---- | ---- | ---- |
-| `omega` | $\omega$ | $\text{Hz} = \frac{1}{s}$ |
-| `temperature` | $T$ |$K$ |
-| `eta` | $\eta$ | $\text{Hz} = \frac{1}{s}$ |
-| `unit_cell_volume` | V | $(a.u.)^{3}$ |
-
-* In addition, the square of the absolute value of the results is also saved for later plotting.
-* Furthermore, a mean value is calculated across all elements of the conductivity tensor and also added to the data frame.
 
 ## Code execution
 
@@ -431,11 +429,29 @@ The files contain the following:
 
 The new columns are labeled as follows:
 
-| Label $\text{where a1,a2} \in \{"px","py","pz"\}$ | Meaning |
+| column example | description |
 | ---- | ---- |
-| "sigma_{a1}{a2}" | components of the conductivity tensor |
-| ""sigma_{a1}{a2}_abs" | absolute value of the component |
-| "sigma_mean" | mean value |
+| sigma_inter_pxpx | komplex value of interband conductivity $\sigma_{x,x}^{\text{inter}, SI}(\vec{k})$ |
+| sigma_inter_pxpx_abs | absolute value of interband conductivity |
+| sigma_inter_pxpx_real | real part of interband conductivity |
+| sigma_inter_pxpx_imag | imaginary part of interband conductivity |
+| sigma_intra_pxpx | komplex value of intraband conductivity $\sigma_{x,x}^{\text{intra}, SI}(\vec{k})$ |
+| sigma_intra_pxpx_abs | absolute value of intraband conductivity |
+| sigma_intra_pxpx_real | real part of intraband conductivity |
+| sigma_intra_pxpx_imag | imaginary part of intraband conductivity |
+
+The terminal displays the following macroscopic values:
+* Tensor of the macroscopic conductivity (Real- and Imaginarypart): $ \quad \sigma^{\text{inter}, SI} + \sigma^{\text{intra}, SI} $
+* Tensor of the macroscopic interband conductivity: (Real- and Imaginarypart)  $  \quad \sigma^{\text{inter}, SI} $
+* Tensor of the macroscopic intraband conductivity: (Real- and Imaginarypart)  $  \quad \sigma^{\text{intra}, SI} $
+* Trace/3 of the komplex macroscopic conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
+* Trace/3 of the macroscopic interband conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
+* Trace/3 of the macroscopic intraband conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{intra}, SI} $
+* Complex refractive index $n$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
+* Complex refractive index $n$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
+* Complex $\alpha$ calculated from $\frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
+* Complex $\alpha_{inter}$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
+* Percentage of pure interband $\alpha$ in relation to total $\alpha$: $\quad 100 \cdot \frac{\alpha_{inter}}{\alpha} $
 
 # General information about configuration files with "plot"
 

@@ -27,8 +27,6 @@ def run(cfg):
     a_coeffs = cfg.a_coeffs if hasattr(cfg, "a_coeffs") else (print("Achtung: 'a_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     b_coeffs = cfg.b_coeffs if hasattr(cfg, "b_coeffs") else (print("Achtung: 'b_coeffs' fehlt - noch keine Pfad-Berechnung? - setze: []"), None)[1]
     modeltype_path = cfg.modeltype_path if hasattr(cfg, "modeltype_path") else (print("Achtung: 'modeltype_path' fehlt - noch keine Pfad-Berechnung? - setze: None"), None)[1]
-
-    
     
     # ###################################################################################
     # Hilfsfunktionen für:
@@ -257,9 +255,39 @@ def run(cfg):
         # -------------------------------------------------------------------------------
         df_original = model.model_load_df(p_str, n_str, cfg.datlabel, "df_original", modeltype)
         if kubo_k:
-            print("- k-weise Berechnung der Kubo-Greenwood-Formel")
-            # Laden der Originalenergien in Ry
-            df = model.kubo_k(cfg.omega, cfg.temperature, cfg.eta, df, df_original, cfg.bandnumbers, cfg.unit_cell_volume)               
+
+            # Standartparameter
+            atol_sigma_weights = cfg.atol_sigma_weights if hasattr(cfg, "atol_sigma_weights") else (print("Achtung: 'atol_sigma_weights' fehlt - setze: 1e-9"), 1e-9)[1]
+            
+            # Berechnung der Inter und Intrabandbeiträge zur Leitfähigkeit pro k-Punkt
+            df = model.sigma_k_inter(cfg.omega, cfg.temperature, cfg.eta, df, df_original, cfg.bandnumbers, cfg.unit_cell_volume)   
+            df = model.sigma_k_intra(cfg.omega, cfg.temperature, cfg.eta, df, df_original, cfg.bandnumbers, cfg.unit_cell_volume)
+
+            # Makroskopische Leitfähigkeit
+            sigma_trace, sigma_inter_trace = model.sigma(df, cfg.sigma_weights, atol_weights=atol_sigma_weights)
+
+            # Komplexer Brechungsindex
+            print(f"\n=======================================")
+            print(f" Inter + Intra | komplexer Brechungsindex aus Tr Sigma")
+            n_complex = model.n_complex(sigma_trace, cfg.omega, cfg.epsilon_r)
+            print(f" Inter | komplexee Brechungsindex aus Tr Sigma")
+            n_inter_complex = model.n_complex(sigma_inter_trace, cfg.omega, cfg.epsilon_r)
+
+            # Absorptionskoeffizient
+            print(f"\n=======================================")
+            print(f" Inter + Intra | Reflexionskoeffizient aus Tr Sigma")
+            alpha = model.alpha(sigma_trace, n_complex)
+            print(f" Inter | Reflexionskoeffizient aus Tr Sigma")
+            alpha_inter = model.alpha(sigma_inter_trace, n_inter_complex)
+
+            print(f"\n=======================================")
+            delta_alpha = 100 * (alpha_inter) / alpha 
+
+            print("Prozentualer Anteil der reinen Interband-Absorption an der Gesamtabsorption:")
+            print(f"100 * (alpha_inter) / alpha ")
+            print(delta_alpha)
+            print()
+
         # -------------------------------------------------------------------------------
         # Speichern
         # -------------------------------------------------------------------------------

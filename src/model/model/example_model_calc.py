@@ -135,7 +135,11 @@ save_errors = False
 # parameters for calculating the Kubo-Greenwood-Formular
 # ---------------------------------------------------------------------------------------
 kubo_k = False
+
+sigma_weights = None
 unit_cell_volume = 176.8135 #(a.u.)^3
+epsilon_r = 1
+
 omega = 3e-12 ; temperature = 293 ; eta = 0
 
 if __name__ == "__main__":

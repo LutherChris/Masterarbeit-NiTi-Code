@@ -239,7 +239,12 @@ Meaning of parameter n for different grid types:
 | Parameter | Data type | Description | Example |
 | --- | --- | --- | --- |
 | `kubo_k` | (bool) | Calculating parts of the Kubo-Greenwood-Formula | True |
-| omega | (float) | Frequency in (1/s) | 3e-12 |
+| sigma_weights | (list) or None | Weights of the Kubo-Greenwood-Formula | None | 
+| atol_sigma_weights | (float) | Permitted deviation of the sum of all weights from 1 | 1e-9 |
+| omega | (float) | Frequency in (rad/s) | 10.04e12 |
 | temperature | (float) | Temperature in (K) | 293 |
-| eta | (float) | Positive Parameter in Kubo-Greenwood formula in (1/s) | 0 |
-| unit_cell_volume | (float) | Volume of the unit cell in (a.u.)³| 176.8135 |
+| eta | (float) | Positive Parameter in Kubo-Greenwood formula in (rad/s) | 4.6e12 |
+| unit_cell_volume | (float) | Volume of the unit cell in (a.u.)³| 151.5 |
+| epsilon_r | (float) | value of the parameter in the complex reflection coefficient formula | 1 |
+
+- If `sigma_weights=None`, a regular grid is assumed and $w_{\vec{k}}$ is set to $1/N_{\vec{k}}$, where  $N_{\vec{k}}$ is the number of k points.

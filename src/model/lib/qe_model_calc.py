@@ -1945,14 +1945,15 @@ def mme_statistics(df: list,
 # Berechnung zusätzlicher Größen für das Dataframe
 # --------------------------------------------------------------------------------------
 
-def kubo_k(omega: float,
-           temperature: float,
-           eta: float, 
-           df: list,
-           df_original: list,
-           bandnumbers: list,
-           unit_cell_volume: float):
+def sigma_k_inter(omega: float,
+                  temperature: float,
+                  eta: float, 
+                  df: list,
+                  df_original: list,
+                  bandnumbers: list,
+                  unit_cell_volume: float):
     """
+    - Berechnung für Interband-Beiträge
     - Berechnung der Summanten der Kubo-Greenwood-Formel pro k-Wert
     - Ergebnisse des Leitfähigkeitstensors für jeden k-Wert werden als neue Spalten dem Dataframe hinzugefügt
     Args:
@@ -1966,6 +1967,8 @@ def kubo_k(omega: float,
     Return:
         df:             Das um die Tensoreinträg erweiterte Dataframe
     """    
+    print("- Berechnung der Interband-Beiträge")
+    print("----> k-weise Berechnung der Kubo-Greenwood-Formel")
 
     for c in ("kx", "ky", "kz"):
         if c not in df.columns or c not in df_original.columns:
@@ -2001,6 +2004,8 @@ def kubo_k(omega: float,
     factor = -1j * ee**2 / (vcell * hbar * a0)         # = e²/(ħa₀) · (-i/V)
 
     axis = ["px", "py", "pz"]
+
+    # Interbandbeiträge
     for a1 in axis:       # Index alpha
         for a2 in axis:   # Index beta
             # xx, xy, xz, yx, yy, yz, zx, zy, zz
@@ -2018,23 +2023,196 @@ def kubo_k(omega: float,
                         pmn = pmn_re + 1j * pmn_im
                         pp = pnm * pmn              # Produk  <n|p|m><m|p|n>
                         delta = en[n] - en[m]
-                        part_nm.append( (fn - fm)*pp / ( delta * (omega_Ha + delta ) ) )
+                        part_nm.append( ((fn - fm) / delta) * pp / (omega_Ha + delta) )
             sum_nm = sum(part_nm)            
             sum_nm_scaled = sum_nm*factor
-            df[f"sigma_{a1}{a2}"] = sum_nm_scaled
-            df[f"sigma_{a1}{a2}_abs"] = np.abs(sum_nm_scaled.to_numpy())
-            df[f"sigma_{a1}{a2}_real"] = np.real(sum_nm_scaled.to_numpy())
-            df[f"sigma_{a1}{a2}_imag"] = np.imag(sum_nm_scaled.to_numpy())
+            df[f"sigma_inter_{a1}{a2}"] = sum_nm_scaled
+            df[f"sigma_inter_{a1}{a2}_abs"] = np.abs(sum_nm_scaled.to_numpy())
+            df[f"sigma_inter_{a1}{a2}_real"] = np.real(sum_nm_scaled.to_numpy())
+            df[f"sigma_inter_{a1}{a2}_imag"] = np.imag(sum_nm_scaled.to_numpy())
             
     # Mittelwert über alle Matrix-Elemente pro k-Punkt
-    cols = ["sigma_pxpx", "sigma_pypy", "sigma_pzpz"]
-    df["sigma_trace"] = df[cols].sum(axis=1) / 3        # Tr(σ)/3
-    df["sigma_trace_abs"] = np.abs(df["sigma_trace"].to_numpy())
-    df["sigma_trace_real"] = np.real(df["sigma_trace"].to_numpy())
-    df["sigma_trace_imag"] = np.imag(df["sigma_trace"].to_numpy())
+    cols = ["sigma_inter_pxpx", "sigma_inter_pypy", "sigma_inter_pzpz"]
+    df["sigma_inter_trace"] = df[cols].sum(axis=1) / 3        # Tr(σ)/3
+    df["sigma_inter_trace_abs"] = np.abs(df["sigma_inter_trace"].to_numpy())
+    df["sigma_inter_trace_real"] = np.real(df["sigma_inter_trace"].to_numpy())
+    df["sigma_inter_trace_imag"] = np.imag(df["sigma_inter_trace"].to_numpy())
 
     return df
 
+def sigma_k_intra(omega: float,
+                  temperature: float,
+                  eta: float, 
+                  df: list,
+                  df_original: list,
+                  bandnumbers: list,
+                  unit_cell_volume: float):
+    """
+    - Berechnung für Intraband-Beiträge
+    - Berechnung der Summanten der Kubo-Greenwood-Formel pro k-Wert
+    - Ergebnisse des Leitfähigkeitstensors für jeden k-Wert werden als neue Spalten dem Dataframe hinzugefügt
+    Args:
+        omega:          Frequenz in rad/s
+        temperature:    Temperatur in K
+        eta:            positiver Parameter in rad/s
+        df:             Pandas Dataframe für MME in (a.u.)
+        df_original:    Pandas Dataframe der Energien in Hartree
+        bandnumbers:    Liste ausgewählter Bänder
+        unit_cell_volume: Volumen der Einheitszelle in (a.u.)^3
+    Return:
+        df:             Das um die Tensoreinträg erweiterte Dataframe
+    """    
+    print("- Berechnung der Intraband-Beiträge")
+    print("----> k-weise Berechnung der Kubo-Greenwood-Formel")
+
+    for c in ("kx", "ky", "kz"):
+        if c not in df.columns or c not in df_original.columns:
+            raise KeyError(f"Spalte '{c}' fehlt in df oder df_original.")
+
+    if not df.index.equals(df_original.index):
+        raise ValueError("Zeilenindizes von df und df_original sind nicht identisch "
+                        "- die Zuordnung Impulselement -> Bandenergie waere falsch!")
+
+    if not np.allclose(df[["kx","ky","kz"]].to_numpy(),
+                    df_original[["kx","ky","kz"]].to_numpy(), atol=1e-10):
+        raise ValueError("Die k-Werte von df und df_original stimmen nicht ueberein!")
+        
+    # benötigte Konstanten
+    kb = 3.166811563562458e-06 # [kb]=Hartree/K
+    Ry = 2.179872361030e-18   # [Ry]=J
+    Ha = 2*Ry
+    hbar = 1.0545718176461565e-34 # [hbar]= Js
+    fermi_energy = df_original["fermi_energy"].iloc[0] # [fermi_energy]=Hartree
+    a0 = 5.29177210544e-11 # [a0]=m
+    ee = 1.602176634e-19 # [ee]=C
+    vcell = unit_cell_volume # [vcell]=(a.u.)^3
+
+    def fermifunc(T,E):
+            # [T]=K, kb=[Ha/K]
+            if T <= 0:
+                raise ValueError(f"Warnung: Temperatur sollte größer als 0 sein.")
+            return expit(-(E - fermi_energy)/(kb*T)) 
+
+    omega_Ha = hbar * (omega + 1j * eta) / Ha          # Frequenz in Hartree
+    occ = {n: fermifunc(temperature, df_original[f"band{n}"]) for n in bandnumbers}
+    factor = -1j * ee**2 / (vcell * hbar * a0)         # = e²/(ħa₀) · (-i/V)
+
+    axis = ["px", "py", "pz"]
+
+    # Intrabandbeiträge
+    factor = 1j * ee**2 / (vcell * hbar * a0 * omega_Ha * kb * temperature)
+    for a1 in axis:       # Index alpha
+        for a2 in axis:   # Index beta
+            # xx, xy, xz, yx, yy, yz, zx, zy, zz
+            part_nm = []
+            for n in bandnumbers:      # Index n
+                fn = occ[n]
+                pnm_re = df[f"{a1}_re_{n}-{n}"]
+                pnm_im = df[f"{a1}_im_{n}-{n}"]
+                pmn_re = df[f"{a2}_re_{n}-{n}"]
+                pmn_im = df[f"{a2}_im_{n}-{n}"]
+                pnm = pnm_re + 1j * pnm_im
+                pmn = pmn_re + 1j * pmn_im
+                pp = pnm * pmn              # Produk  <n|p|m><m|p|n>
+                part_nm.append( fn*(1-fn)*pp )
+            sum_nm = sum(part_nm)            
+            sum_nm_scaled = sum_nm*factor
+            df[f"sigma_intra_{a1}{a2}"] = sum_nm_scaled
+            df[f"sigma_intra_{a1}{a2}_abs"] = np.abs(sum_nm_scaled.to_numpy())
+            df[f"sigma_intra_{a1}{a2}_real"] = np.real(sum_nm_scaled.to_numpy())
+            df[f"sigma_intra_{a1}{a2}_imag"] = np.imag(sum_nm_scaled.to_numpy())
+            
+    # Mittelwert über alle Matrix-Elemente pro k-Punkt
+    cols = ["sigma_intra_pxpx", "sigma_intra_pypy", "sigma_intra_pzpz"]
+    df["sigma_intra_trace"] = df[cols].sum(axis=1) / 3        # Tr(σ)/3
+    df["sigma_intra_trace_abs"] = np.abs(df["sigma_intra_trace"].to_numpy())
+    df["sigma_intra_trace_real"] = np.real(df["sigma_intra_trace"].to_numpy())
+    df["sigma_intra_trace_imag"] = np.imag(df["sigma_intra_trace"].to_numpy())
+
+    return df
+
+def sigma(df: list,
+          weights: list,
+          atol_weights: float = 1e-9):
+
+    print("Berechnung der makroskopischen Leitfähigkeit")
+    if weights: 
+        print("----> Berechnung über Gewichte")
+        if not abs(sum(weights)- 1.0) <= atol_weights:
+            raise ValueError(f"Summe über alle Gewichte ist nicht kleiner als {atol_weights}")
+        if len(weights) != len(df):
+            raise ValueError("Anzahl der Gewichte entspricht nicht der Anzahl der k-Punkte")
+        print(f"----> Summer über alle Gewichte ist kleiner als {atol_weights} und die Anzahl der Gewichte stimmt mit der Anzahl er k-Punkte überein. ")
+    else:
+        print(f"----> Keine Gewichte gesetzt: Summe über k wird mit 1/nk normiert. nk={len(df)}")
+    
+    axis = ["px", "py", "pz"]
+    sigma_inter = np.zeros((3,3), dtype=complex) # Nullmatrix
+    sigma_intra = np.zeros((3,3), dtype=complex) # Nullmatrix
+    sigma = np.zeros((3,3), dtype=complex) # Nullmatrix
+    for i, a1 in enumerate(axis):
+        for j, a2 in enumerate(axis):
+            sigma_inter_a1a2 = df[f"sigma_inter_{a1}{a2}"]
+            sigma_intra_a1a2 = df[f"sigma_intra_{a1}{a2}"]
+            if not weights:
+                inter = sum(sigma_inter_a1a2) / len(df)
+                intra = sum(sigma_intra_a1a2) / len(df)
+                sigma_inter[i][j] = inter
+                sigma_intra[i][j] = intra
+                sigma[i][j] = inter + intra
+            else:
+                inter = sum(sigma_inter_a1a2 * weights)
+                intra = sum(sigma_intra_a1a2 * weights)
+                sigma_inter[i][j] = inter
+                sigma_intra[i][j] = intra
+                sigma[i][j] = inter + intra
+
+    print(f"=======================================")
+    print(f"----> Inter + Intra | Sigma")
+    print(f"      Realteil:\n{sigma.real}")
+    print(f"      Imaginärteil:\n{sigma.imag}")
+    print(f" --------------------------------------")
+    print(f"----> Inter | Sigma")
+    print(f"      Realteil:\n{sigma_inter.real}")
+    print(f"      Imaginärteil:\n{sigma_inter.imag}")
+    print(f" --------------------------------------")
+    print(f"----> Intra | Sigma")
+    print(f"      Realteil:\n{sigma_intra.real}")
+    print(f"      Imaginärteil:\n{sigma_intra.imag}\n")
+
+    # Spur des Tensors
+    sigma_trace = (sigma[0][0]+sigma[1][1]+sigma[2,2])/3
+    print(f"=======================================")
+    print(f"----> Inter + Intra | Tr Sigma")
+    print(f"      {sigma_trace}\n  ~ {sigma_trace:.2e}")
+
+    sigma_inter_trace = (sigma_inter[0][0]+sigma_inter[1][1]+sigma_inter[2,2])/3
+    print(f" --------------------------------------")
+    print(f"----> Inter | Tr Sigma")
+    print(f"      {sigma_inter_trace}\n  ~ {sigma_inter_trace:.2e}")
+    print(f" --------------------------------------")
+    sigma_intra_trace = (sigma_intra[0][0]+sigma_intra[1][1]+sigma_intra[2,2])/3
+    print(f"----> Intra | Tr Sigma")
+    print(f"      {sigma_intra_trace}\n  ~ {sigma_intra_trace:.2e}")
+    return sigma_trace, sigma_inter_trace
+
+def n_complex(sigma_trace: complex,
+              omega: float,
+              epsilon_r: float):
+    epsilon0 = 8.8541878188e-12
+    n_complex = np.sqrt(epsilon_r + (1j*sigma_trace)/(omega*epsilon0))
+    print(f"      n: {n_complex}\n  ~ {n_complex:.2e}")
+    return n_complex
+
+def alpha(sigma_trace: float,
+          n_complex: float):
+    n_real = n_complex.real
+    sigma_real = sigma_trace.real
+    epsilon0 = 8.8541878188e-12
+    c = 299792458
+    alpha = sigma_real / (c*n_real*epsilon0)
+    print(f"      alpha: {alpha}\n  ~ {alpha:.2e}")
+    return alpha
 
 # --------------------------------------------------------------------------------------
 # Berechnung des Schnittpunktes

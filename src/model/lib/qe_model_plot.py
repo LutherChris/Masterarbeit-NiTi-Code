@@ -408,7 +408,7 @@ def model_3Dsurface(axis: str,
     elif energy == "band1":
         e_label = f"$E_1$"
     else:
-        e_label = ""
+        e_label = energy
 
     exponenten = {}
     # Datem skalieren
@@ -697,14 +697,14 @@ def model_4Dplots(p: list,
     ax.axis("equal")
 
     # Colorbar allgemein
-    cbar_ax = fig.add_axes([0.80, 0.15, 0.03, 0.6])
+    cbar_ax = fig.add_axes([0.8, 0.15, 0.03, 0.6])
     cbar = fig.colorbar(im, cax=cbar_ax)
     cbar.formatter.set_scientific(True)
     cbar.formatter.set_powerlimits((0, 0))
-    #cbar.set_label(r"$\Delta E_\text{QE}$ [eV]", labelpad=2)
+    cbar.set_label(f"{axes[3]}", labelpad=2)
     cbar_ax.tick_params(axis='y', pad=2)
     #ax.view_init(elev=20, azim=-30)
-    ax.view_init(elev=30, azim=-30)
+    ax.view_init(elev=22, azim=-5)
 
     if TITEL:
         plt.title(f"{title}")   
