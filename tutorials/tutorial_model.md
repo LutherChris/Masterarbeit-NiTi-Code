@@ -445,16 +445,16 @@ The new columns are labeled as follows:
 | sigma_intra_pxpx_imag | imaginary part of intraband conductivity |
 
 The terminal displays the following macroscopic values:
-* Tensor of the macroscopic conductivity (Real- and Imaginarypart)
-* Tensor of the macroscopic interband conductivity: (Real- and Imaginarypart)
-* Tensor of the macroscopic intraband conductivity: (Real- and Imaginarypart)
-* (1): Trace of the komplex macroscopic conductivity devided by 3
+* Tensor of the macroscopic conductivity
+* Tensor of the macroscopic interband conductivity
+* Tensor of the macroscopic intraband conductivity
+* (1): Trace of the macroscopic conductivity devided by 3
 * (2): Trace of the macroscopic interband conductivity devided by 3
 * Trace of the macroscopic intraband conductivity devided by 3
-* (1.1): Complex refractive index $n$ calculated from (1)
-* (2.1): Complex refractive index $n$ calculated from (2)
-* (1.1.1): Complex $\alpha$ calculated (1.1)
-* (2.1.1): Complex $\alpha$ calculated (2.1)
+* (1.1): refractive index $n$ calculated from (1)
+* (2.1): refractive index $n$ calculated from (2)
+* (1.1.1): $\alpha$ calculated (1.1)
+* (2.1.1): $\alpha$ calculated (2.1)
 * Percentage of interband $\alpha$ in relation to total $\alpha$ ( 100*(1.1.1) / (2.1.1) )
 
 # General information about configuration files with "plot"
