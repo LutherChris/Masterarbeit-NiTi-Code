@@ -68,6 +68,7 @@ Following the DFT calculation, the XML files from QE are read in during the anal
 Before modeling the band energies, coordinate transformations, PCA analysis, or data filtering to the THz-active region can be performed.
 After modeling, the model is compared with the QE data points to estimate initial inaccuracies.
 The calculated model coefficients are saved as text files for later use.
+Finally, macroscopic quantities such as conductivity can be estimated.
 
 The `plot` submodule can be used to generate additional plots of the models and the QE data.
 For example, it offers 2D slider plots, 3D plots with energy as the color axis, and plots that show the errors as a function of various model orders.
