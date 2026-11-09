@@ -445,23 +445,17 @@ The new columns are labeled as follows:
 | sigma_intra_pxpx_imag | imaginary part of intraband conductivity |
 
 The terminal displays the following macroscopic values:
-* Tensor of the macroscopic conductivity (Real- and Imaginarypart): 
-$$ \quad \sigma^{\text{inter}, SI} + \sigma^{\text{intra}, SI} $$
+* Tensor of the macroscopic conductivity (Real- and Imaginarypart)
 * Tensor of the macroscopic interband conductivity: (Real- and Imaginarypart)
-$$  \quad \sigma^{\text{inter}, SI} $$
 * Tensor of the macroscopic intraband conductivity: (Real- and Imaginarypart)
-$$  \quad \sigma^{\text{intra}, SI} $$
-* Trace/3 of the komplex macroscopic conductivity:
-$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $$
-* Trace/3 of the macroscopic interband conductivity: 
-$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $$
-* Trace/3 of the macroscopic intraband conductivity:
-$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{intra}, SI} $$
-* Complex refractive index $n$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
-* Complex refractive index $n$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
-* Complex $\alpha$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
-* Complex $\alpha_{inter}$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
-* Percentage of pure interband $\alpha$ in relation to total $$\alpha$: $\quad 100 \cdot \frac{\alpha_{inter}}{\alpha} $$
+* (1): Trace of the komplex macroscopic conductivity devided by 3
+* (2): Trace of the macroscopic interband conductivity devided by 3
+* Trace of the macroscopic intraband conductivity devided by 3
+* (1.1): Complex refractive index $n$ calculated from (1)
+* (2.1): Complex refractive index $n$ calculated from (2)
+* (1.1.1): Complex $\alpha$ calculated (1.1)
+* (2.1.1): Complex $\alpha$ calculated (2.1)
+* Percentage of interband $\alpha$ in relation to total $\alpha$ ( 100*(1.1.1) / (2.1.1) )
 
 # General information about configuration files with "plot"
 
