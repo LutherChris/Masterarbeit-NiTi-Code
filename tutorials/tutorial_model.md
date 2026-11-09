@@ -295,26 +295,28 @@ The configuration parameters do the following:
 
 This section calculates the conductivity based on the Kubo-Greenwood formula in SI-Units.
 For interband contributions:
+
 $$
-\sigma_{\alpha \beta}^{\text{inter}, SI}=
--\frac{i e^{2}}{V  \hbar a_{0}}
-\sum\limits_{\vec{k}} w_{\vec{k}}
-\sum\limits_{n \neq m}
+\sigma_{\alpha \beta}^{\text{inter}, SI}= -\frac{i e^{2}}{V  \hbar a_{0}}
+\sum_{\vec{k}} w_{\vec{k}}
+\sum_{n \neq m}
 \left( \frac{f_{n\vec{k}} -f_{m\vec{k}}}{\Delta_{nm}(\vec{k})} \right)
 \frac{P^{\alpha}_{nm}(\vec{k}) P^{\beta}_{mn}(\vec{k})}{\frac{\hbar(\omega+i\eta)}{(2R_{y})}+\Delta_{nm}(\vec{k})}
 \qquad \text{with} \quad
-\sum\limits_{\vec{k}}w_{\vec{k}}=1
+\sum_{\vec{k}}w_{\vec{k}}=1
 $$
+
 For intraband-contributions:
+
 $$
 \sigma_{\alpha \beta}^{\text{intra}, SI}=
 \frac{i e^{2} (2 R_{y})}{V  \hbar^{2} a_{0} (\omega+i\eta)k_{B}T}
-\sum\limits_{\vec{k}} w_{\vec{k}}
-\sum\limits_{n}
+\sum_{\vec{k}} w_{\vec{k}}
+\sum_{n}
 f(E_{n})\left(1-f(E_{n})\right)
 P^{\alpha}_{nn}(\vec{k}) P^{\beta}_{nn} (\vec{k})
 \qquad \text{with} \quad
-\sum\limits_{\vec{k}}w_{\vec{k}}=1
+\sum_{\vec{k}}w_{\vec{k}}=1
 $$
 
 | Quantity | Value or Unit |
@@ -335,7 +337,9 @@ $$
 | $w_{\vec{k}}$ = Weights of the k-summation | $[w_{\vec{k}}]=1$ |
 
 In addition, the reflection coefficient $\alpha$ is calculated using:
+
 $$n = Re\left[ \sqrt{\epsilon_{r} + \frac{i \sigma}{\omega\epsilon_{0}}}~ \right]$$
+
 $$\alpha = \frac{2\omega \xi}{c}= \frac{Re[\sigma]}{cn\epsilon_{0}}$$
 
 
