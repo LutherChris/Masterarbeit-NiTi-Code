@@ -445,17 +445,23 @@ The new columns are labeled as follows:
 | sigma_intra_pxpx_imag | imaginary part of intraband conductivity |
 
 The terminal displays the following macroscopic values:
-* Tensor of the macroscopic conductivity (Real- and Imaginarypart): $ \quad \sigma^{\text{inter}, SI} + \sigma^{\text{intra}, SI} $
-* Tensor of the macroscopic interband conductivity: (Real- and Imaginarypart)  $  \quad \sigma^{\text{inter}, SI} $
-* Tensor of the macroscopic intraband conductivity: (Real- and Imaginarypart)  $  \quad \sigma^{\text{intra}, SI} $
-* Trace/3 of the komplex macroscopic conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
-* Trace/3 of the macroscopic interband conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
-* Trace/3 of the macroscopic intraband conductivity: $  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{intra}, SI} $
-* Complex refractive index $n$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
-* Complex refractive index $n$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
-* Complex $\alpha$ calculated from $\frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
-* Complex $\alpha_{inter}$ calculated from $ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
-* Percentage of pure interband $\alpha$ in relation to total $\alpha$: $\quad 100 \cdot \frac{\alpha_{inter}}{\alpha} $
+* Tensor of the macroscopic conductivity (Real- and Imaginarypart): 
+$$ \quad \sigma^{\text{inter}, SI} + \sigma^{\text{intra}, SI} $$
+* Tensor of the macroscopic interband conductivity: (Real- and Imaginarypart)
+$$  \quad \sigma^{\text{inter}, SI} $$
+* Tensor of the macroscopic intraband conductivity: (Real- and Imaginarypart)
+$$  \quad \sigma^{\text{intra}, SI} $$
+* Trace/3 of the komplex macroscopic conductivity:
+$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $$
+* Trace/3 of the macroscopic interband conductivity: 
+$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $$
+* Trace/3 of the macroscopic intraband conductivity:
+$$  \quad \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{intra}, SI} $$
+* Complex refractive index $n$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
+* Complex refractive index $n$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
+* Complex $\alpha$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}}  \left( \sigma_{ii}^{\text{inter}, SI} + \sigma_{ii}^{\text{intra}, SI} \right) $
+* Complex $\alpha_{inter}$ calculated from $$ \frac{1}{3} \sum_{i\in \{ x,y,z\}} \sigma_{ii}^{\text{inter}, SI} $
+* Percentage of pure interband $\alpha$ in relation to total $$\alpha$: $\quad 100 \cdot \frac{\alpha_{inter}}{\alpha} $$
 
 # General information about configuration files with "plot"
 
